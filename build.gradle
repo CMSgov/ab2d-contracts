@@ -19,6 +19,7 @@ allprojects {
     apply plugin: 'gov.cms.ab2d.plugin'
     dependencies {
 //    implementation project(':common')
+        implementation 'gov.cms.ab2d:ab2d-properties-client:1.1.0'
         implementation 'org.springframework.boot:spring-boot-starter-quartz:2.7.4'
         implementation 'net.logstash.logback:logstash-logback-encoder:7.2'
         implementation 'org.springframework.boot:spring-boot-starter-webflux:2.7.4'
@@ -41,6 +42,7 @@ allprojects {
         implementation 'gov.cms.ab2d:ab2d-fhir:1.1.1'
         implementation 'com.newrelic.agent.java:newrelic-api:7.10.0'
         implementation 'gov.cms.ab2d:ab2d-events-client:1.9'
+        implementation 'gov.cms.ab2d:ab2d-contracts-client:0.1.0-1-SNAPSHOT'
         implementation 'org.springframework.cloud:spring-cloud-starter-aws-messaging:2.2.6.RELEASE'
         testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.4'
         testImplementation 'org.apache.httpcomponents:httpcore:4.4.15'
