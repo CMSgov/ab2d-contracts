@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PropertiesRepository extends JpaRepository<Property, Long> {
 
-    Optional<Properties> findByKey(String key);
+    Optional<Property> findByKey(String key);
 }

@@ -5,11 +5,14 @@ import gov.cms.ab2d.contracts.model.Property;
 import gov.cms.ab2d.contracts.repository.PropertiesRepository;
 import gov.cms.ab2d.contracts.service.AttestationUpdaterService;
 import gov.cms.ab2d.contracts.service.FeatureEngagement;
+import gov.cms.ab2d.properties.client.PropertiesClient;
+import gov.cms.ab2d.properties.client.PropertiesClientImpl;
 import java.util.Optional;
 import java.util.Properties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 
@@ -22,6 +25,15 @@ public class HPMSIngestJob extends QuartzJobBean {
     private final AttestationUpdaterService aus;
     private final PropertiesRepository propertiesRepository;
 
+    @Value("${property.service.url}")
+    private String propertyServiceUrl;
+
+    @Value("${feature.property.service.enabled}")
+    private boolean propertiesFlag;
+
+    private final PropertiesClient propertiesClient = new PropertiesClientImpl(propertyServiceUrl);
+
+
     @SuppressWarnings("NullableProblems")
     @Override
     protected void executeInternal(JobExecutionContext context) {
@@ -33,6 +45,13 @@ public class HPMSIngestJob extends QuartzJobBean {
     }
 
     public FeatureEngagement getEngagement() {
-        return FeatureEngagement.fromString(propertiesRepository.findByKey(HPMS_INGESTION_ENGAGEMENT).toString());
+        if(propertiesFlag) {
+            //TODO Enable when properties service is available
+            return FeatureEngagement.fromString(propertiesClient.getProperty(HPMS_INGESTION_ENGAGEMENT).toString());
+        }
+        else {
+            //TODO Delete when properties service is available
+            return FeatureEngagement.fromString(propertiesRepository.findByKey(HPMS_INGESTION_ENGAGEMENT).toString());
+        }
     }
 }
