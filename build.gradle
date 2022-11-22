@@ -3,61 +3,40 @@ plugins {
     id 'org.springframework.boot' version '2.7.0'
     id 'com.jfrog.artifactory' version '4.27.1' apply false
     id "org.sonarqube" version "3.3"
-    id "gov.cms.ab2d.plugin" version "0.0.1-SNAPSHOT"
+    id "gov.cms.ab2d.plugin" version "1.0"
     id 'maven-publish'
-}
-
-group 'org.example'
-version '1.0-SNAPSHOT'
-
-repositories {
-    mavenCentral()
-    mavenLocal()
 }
 
 allprojects {
     apply plugin: 'gov.cms.ab2d.plugin'
     dependencies {
-//    implementation project(':common')
         implementation 'org.springframework.boot:spring-boot-starter-quartz:2.7.4'
         implementation 'net.logstash.logback:logstash-logback-encoder:7.2'
         implementation 'org.springframework.boot:spring-boot-starter-webflux:2.7.4'
         testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.4'
-        //    testImplementation project(':common')
         testImplementation 'org.mockito:mockito-inline:4.8.0'
-        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-        implementation 'javax.validation:validation-api:2.0.1.Final'
         implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.4'
         implementation 'org.springframework.boot:spring-boot-starter-security:2.7.4'
-        implementation 'org.springframework.boot:spring-boot-starter-web:2.7.4'
         implementation 'org.springframework.boot:spring-boot-starter-validation:2.7.4'
-        implementation 'org.apache.commons:commons-lang3:3.12.0'
         implementation 'org.postgresql:postgresql:42.5.0'
         implementation 'org.liquibase:liquibase-core:4.9.1'
-        implementation 'ca.uhn.hapi.fhir:hapi-fhir-structures-dstu3:6.1.2'
-        implementation 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.1.2'
-        implementation 'org.modelmapper:modelmapper:3.1.0'
-        implementation 'gov.cms.ab2d:ab2d-fhir:1.1.1'
-        implementation 'com.newrelic.agent.java:newrelic-api:7.10.0'
         implementation 'gov.cms.ab2d:ab2d-events-client:1.9'
+        implementation 'gov.cms.ab2d:ab2d-contracts-client:0.2.0'
+        implementation 'gov.cms.ab2d:ab2d-properties-client:1.1.0'
         implementation 'org.springframework.cloud:spring-cloud-starter-aws-messaging:2.2.6.RELEASE'
-        testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.4'
-        testImplementation 'org.apache.httpcomponents:httpcore:4.4.15'
-        compileOnly 'com.newrelic.agent.java:newrelic-java:7.10.0'
         testImplementation 'org.testcontainers:testcontainers:1.17.5'
         testImplementation 'org.testcontainers:postgresql:1.17.5'
         testImplementation 'org.testcontainers:junit-jupiter:1.17.5'
         testImplementation 'org.testcontainers:localstack:1.17.5'
         compileOnly 'org.projectlombok:lombok:1.18.24'
-
-        implementation 'com.slack.api:slack-api-client:1.25.1'
-        implementation 'ca.uhn.hapi.fhir:hapi-fhir-client:6.1.2'
-
-
     }
 }
 
 test {
     useJUnitPlatform()
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
 }
