@@ -22,7 +22,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(classes = SpringBootApp.class)
+@SpringBootTest
 @TestPropertySource(locations = "/application.properties")
 @Testcontainers
 class MockedFetchTest {

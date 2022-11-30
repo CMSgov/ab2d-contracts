@@ -16,7 +16,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * Since this test modifies properties
  */
 
-@SpringBootTest(classes = SpringBootApp.class)
+@SpringBootTest
 @TestPropertySource(locations = "/application.properties")
 @Testcontainers
 @TestPropertySource(properties = {
