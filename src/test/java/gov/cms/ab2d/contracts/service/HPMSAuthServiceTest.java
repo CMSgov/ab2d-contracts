@@ -1,7 +1,7 @@
 package gov.cms.ab2d.contracts.service;
 
+import gov.cms.ab2d.contracts.SpringBootApp;
 import gov.cms.ab2d.contracts.util.AB2DPostgresqlContainer;
-import gov.cms.ab2d.contracts.SpringBootTestApp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(classes = SpringBootTestApp.class)
+@SpringBootTest(classes = SpringBootApp.class)
 @TestPropertySource(locations = "/application.properties")
 @Testcontainers
 // HPMSAuthServiceImpl holds some state that's useful normally but can break tests. Reset the bean after each test.

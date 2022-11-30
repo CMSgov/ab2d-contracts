@@ -6,13 +6,16 @@ import gov.cms.ab2d.contracts.repository.ContractRepository;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 
 import static java.util.stream.Collectors.toList;
 
+@Service
 @AllArgsConstructor
+@Slf4j
 public class ContractServiceImpl implements ContractService {
-
     private final ContractRepository contractRepository;
 
     @Override
@@ -32,7 +35,6 @@ public class ContractServiceImpl implements ContractService {
         if (contract.isPresent()) {
             return contract.get();
         }
-
         throw new InvalidContractException("Invalid Contract Given");
     }
 

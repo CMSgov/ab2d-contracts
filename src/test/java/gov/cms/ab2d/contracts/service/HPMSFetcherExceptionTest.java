@@ -1,6 +1,6 @@
 package gov.cms.ab2d.contracts.service;
 
-import gov.cms.ab2d.contracts.SpringBootTestApp;
+import gov.cms.ab2d.contracts.SpringBootApp;
 import gov.cms.ab2d.contracts.util.AB2DPostgresqlContainer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * Since this test modifies properties
  */
 
-@SpringBootTest(classes = SpringBootTestApp.class)
+@SpringBootTest(classes = SpringBootApp.class)
 @TestPropertySource(locations = "/application.properties")
 @Testcontainers
 @TestPropertySource(properties = {

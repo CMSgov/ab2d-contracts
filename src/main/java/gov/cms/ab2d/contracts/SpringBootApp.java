@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 @ComponentScan(basePackages = {"gov.cms.ab2d.contracts", "gov.cms.ab2d.eventclient.clients"})
 @EntityScan(basePackages = {"gov.cms.ab2d.contracts"})
-@EnableJpaRepositories("gov.cms.ab2d.contracts.repository")
+//@EnableJpaRepositories("gov.cms.ab2d.contracts.repository")
 @PropertySource("classpath:application.properties")
 @Import({HPMSIngestQuartzSetup.class})
 public class SpringBootApp {

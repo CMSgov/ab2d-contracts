@@ -8,7 +8,7 @@ import org.joda.time.DateTime;
 @Data
 @Builder
 public class ErrorMessage {
-    private Date timestamp = DateTime.now().toDate();
+    private Date timestamp;
     private String path;
     private int code;
     private String message;
