@@ -1,7 +1,7 @@
 package gov.cms.ab2d.contracts.service;
 
-import gov.cms.ab2d.contracts.util.AB2DPostgresqlContainer;
 import gov.cms.ab2d.contracts.SpringBootTestApp;
+import gov.cms.ab2d.contracts.util.AB2DPostgresqlContainer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
