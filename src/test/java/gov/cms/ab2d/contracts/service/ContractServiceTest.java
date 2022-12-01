@@ -69,7 +69,7 @@ class ContractServiceTest {
     @Test
     void testInvalidContract() {
         InvalidContractException exception = assertThrows(InvalidContractException.class, () -> {
-            service.getContractByContractId(42l);
+            service.getContractByContractId(42L);
         });
         assertEquals("Invalid Contract Given", exception.getMessage());
 

@@ -1,20 +1,16 @@
 package gov.cms.ab2d.contracts.quartz;
 
-import com.amazonaws.services.sns.model.ResourceNotFoundException;
-import gov.cms.ab2d.contracts.model.Property;
 import gov.cms.ab2d.contracts.repository.PropertiesRepository;
 import gov.cms.ab2d.contracts.service.AttestationUpdaterService;
 import gov.cms.ab2d.contracts.service.FeatureEngagement;
 import gov.cms.ab2d.properties.client.PropertiesClient;
 import gov.cms.ab2d.properties.client.PropertiesClientImpl;
-import java.util.Optional;
-import java.util.Properties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.*;
+import org.quartz.DisallowConcurrentExecution;
+import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-
 
 
 @Slf4j
@@ -45,11 +41,10 @@ public class HPMSIngestJob extends QuartzJobBean {
     }
 
     public FeatureEngagement getEngagement() {
-        if(propertiesFlag) {
+        if (propertiesFlag) {
             //TODO Enable when properties service is available
             return FeatureEngagement.fromString(propertiesClient.getProperty(HPMS_INGESTION_ENGAGEMENT).toString());
-        }
-        else {
+        } else {
             //TODO Delete when properties service is available
             return FeatureEngagement.fromString(propertiesRepository.findByKey(HPMS_INGESTION_ENGAGEMENT).toString());
         }

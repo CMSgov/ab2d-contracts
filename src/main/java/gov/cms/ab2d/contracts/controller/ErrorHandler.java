@@ -13,12 +13,13 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+
 import static gov.cms.ab2d.eventclient.events.SlackEvents.API_INVALID_CONTRACT;
 
 /**
  * Don't change exception classes without updating alerts in Splunk. Splunk alerts rely on the classname to filter
  * for these exceptions.
- *
+ * <p>
  * todo in the future use an enum instead to make it more consistent
  */
 @ControllerAdvice
@@ -31,10 +32,11 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     private final SQSEventClient eventLogger;
 
     private static final HashMap<Class, HttpStatus> RESPONSE_MAP;
-        static {
-            RESPONSE_MAP = new HashMap<>();
-            RESPONSE_MAP.put(InvalidContractException.class, HttpStatus.FORBIDDEN);
-        }
+
+    static {
+        RESPONSE_MAP = new HashMap<>();
+        RESPONSE_MAP.put(InvalidContractException.class, HttpStatus.FORBIDDEN);
+    }
 
     public ErrorHandler(SQSEventClient eventLogger) {
         this.eventLogger = eventLogger;
@@ -56,7 +58,7 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         eventLogger.sendLogs(new ErrorEvent(null, null,
                 ErrorEvent.ErrorType.UNAUTHORIZED_CONTRACT, description));
 
-        ApiResponseEvent responseEvent = new ApiResponseEvent(null,null, status,
+        ApiResponseEvent responseEvent = new ApiResponseEvent(null, null, status,
                 "API Error", description, (String) request.getAttribute(REQUEST_ID));
         eventLogger.logAndAlert(responseEvent, Ab2dEnvironment.PROD_LIST);
 
