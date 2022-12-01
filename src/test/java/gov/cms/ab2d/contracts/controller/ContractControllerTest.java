@@ -65,8 +65,6 @@ class ContractControllerTest {
                 .andExpect(jsonPath("$.[0].contractName").value("test"))
                 .andExpect(jsonPath("$.[0].hpmsParentOrgId").value(42L));
 
-
-//        originalContract.setContractName("testUpdate");
         this.mockMvc.perform(post("/contract")
                         .content("{\n" +
                                 "    \"created\": \"2022-11-21T10:25:02.851161-08:00\",\n" +
