@@ -1,14 +1,11 @@
 package gov.cms.ab2d.contracts.service;
 
-import gov.cms.ab2d.contracts.SpringBootApp;
 import gov.cms.ab2d.contracts.controller.InvalidContractException;
 import gov.cms.ab2d.contracts.model.Contract;
 import gov.cms.ab2d.contracts.repository.ContractRepository;
 import gov.cms.ab2d.contracts.util.AB2DPostgresqlContainer;
 import java.time.OffsetDateTime;
 import java.util.List;
-import liquibase.repackaged.net.sf.jsqlparser.statement.select.Offset;
-import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,9 +28,6 @@ class ContractServiceTest {
 
     @Container
     private static final PostgreSQLContainer POSTGRE_SQL_CONTAINER = new AB2DPostgresqlContainer();
-
-    private String key = "Hello";
-    private String value = "World";
 
     private ContractService service;
 
