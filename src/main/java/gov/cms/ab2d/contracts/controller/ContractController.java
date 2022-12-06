@@ -13,27 +13,26 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-public class ContractController {
+public class ContractController implements ContractAPI {
     private final ContractService contractService;
 
-    @GetMapping("/contract/all")
+    @Override
     public List<Contract> getAllAttestedContracts() {
         return contractService.getAllContracts();
     }
 
-    @PostMapping("/contract")
+    @Override
     public void updateContract(@RequestBody Contract contract) {
         contractService.updateContract(contract);
     }
 
-    @GetMapping("/contract")
+    @Override
     public Contract getContractByValue(@RequestParam("contractId") Optional<Long> contractId, @RequestParam("contractNumber") Optional<String> contractNumber) {
-        if (contractId.isPresent()) {
-            if (contractNumber.isPresent())
-                throw new InvalidContractParamException("Can't have contractId and contractNumber in the same call");
-
-            return contractService.getContractByContractId(contractId.get());
-        } else if (contractNumber.isPresent())
+        if (contractId.isPresent() && contractNumber.isPresent())
+            throw new InvalidContractParamException("Can't have contractId and contractNumber in the same call");
+        else if (contractId.isPresent())
+                return contractService.getContractByContractId(contractId.get());
+        else if (contractNumber.isPresent())
             return contractService.getContractByContractNumber(contractNumber.get());
         else {
             throw new InvalidContractParamException("Must supply contract information");
