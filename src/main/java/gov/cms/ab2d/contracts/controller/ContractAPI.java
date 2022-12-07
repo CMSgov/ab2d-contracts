@@ -6,19 +6,17 @@ import java.util.Optional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 public interface ContractAPI {
-    @GetMapping("/contract/all")
-    List<Contract> getAllAttestedContracts();
+    @GetMapping("/contract")
+    List<Contract> getContracts(@RequestParam("contractId") Optional<Long> contractId);
 
-    @PostMapping("/contract")
+    @PutMapping("/contract")
     void updateContract(@RequestBody Contract contract);
 
     @GetMapping("/contract/{contractNumber}")
-    Contract getContractByNumber(@PathVariable("contractNumber") Optional<String> contractNumber);
-
-    @GetMapping("/contract")
-    Contract getContractByID(@RequestParam("contractId") Optional<Long> contractId);
+    List<Contract> getContractByNumber(@PathVariable("contractNumber") Optional<String> contractNumber);
 }
