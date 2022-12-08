@@ -1,22 +1,22 @@
 package gov.cms.ab2d.contracts.controller;
 
 import gov.cms.ab2d.contracts.model.Contract;
+import gov.cms.ab2d.contracts.model.ContractDTO;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 public interface ContractAPI {
-    @GetMapping("/contract")
-    List<Contract> getContracts(@RequestParam("contractId") Optional<Long> contractId);
+    @GetMapping("/contracts")
+    List<ContractDTO> getContracts(@RequestParam(required = false) Long contractId);
 
-    @PutMapping("/contract")
-    void updateContract(@RequestBody Contract contract);
+    @PutMapping("/contracts")
+    void updateContract(@RequestBody ContractDTO contract);
 
-    @GetMapping("/contract/{contractNumber}")
-    List<Contract> getContractByNumber(@PathVariable("contractNumber") Optional<String> contractNumber);
+    @GetMapping("/contracts/{contractNumber}")
+    List<ContractDTO> getContractByNumber(@PathVariable("contractNumber") String contractNumber);
 }
+

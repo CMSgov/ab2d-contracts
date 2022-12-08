@@ -29,6 +29,7 @@ allprojects {
         testImplementation 'org.testcontainers:localstack:1.17.6'
         compileOnly 'org.projectlombok:lombok:1.18.24'
         implementation 'org.springframework.boot:spring-boot-starter-web:2.7.5'
+        implementation 'org.modelmapper:modelmapper:3.1.0'
     }
 }
 
