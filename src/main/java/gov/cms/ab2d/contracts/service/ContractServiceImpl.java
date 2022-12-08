@@ -1,6 +1,7 @@
 package gov.cms.ab2d.contracts.service;
 
 import gov.cms.ab2d.contracts.controller.InvalidContractException;
+import gov.cms.ab2d.contracts.controller.InvalidContractParamException;
 import gov.cms.ab2d.contracts.model.Contract;
 import gov.cms.ab2d.contracts.model.ContractDTO;
 import gov.cms.ab2d.contracts.repository.ContractRepository;
@@ -21,10 +22,16 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     public void updateContract(ContractDTO contractDTO) {
-        Optional<Contract> contract = contractRepository.findContractByContractNumber(contractDTO.getContractNumber());
-        if(contract.isPresent()) {
-            contractRepository.save(contract.get());
+        Optional<Contract> optionalContract = contractRepository.findContractByContractNumber(contractDTO.getContractNumber());
+        if(optionalContract.isPresent()) {
+            Contract contract = optionalContract.get();
+            contract.setContractName(contractDTO.getContractName());
+            contract.setContractType(contractDTO.getContractType());
+            contract.setAttestedOn(contractDTO.getAttestedOn());
+            contractRepository.save(contract);
         }
+        else
+            throw new InvalidContractException("Contract Given is Invalid");
     }
 
     @Override

@@ -1,6 +1,5 @@
 package gov.cms.ab2d.contracts.controller;
 
-import gov.cms.ab2d.contracts.model.Contract;
 import gov.cms.ab2d.contracts.model.ContractDTO;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
