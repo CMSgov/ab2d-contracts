@@ -22,13 +22,14 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     public void updateContract(ContractDTO contractDTO) {
-        Optional<Contract> optionalContract = contractRepository.findContractByContractNumber(contractDTO.getContractNumber());
+        Optional<Contract> optionalContract = contractRepository.findById(contractDTO.getId());
         if (optionalContract.isPresent()) {
-            Contract contract = dtoToContract(contractDTO, optionalContract);
+            Contract contract = dtoToContract(contractDTO, optionalContract.get());
             contractRepository.save(contract);
         }
-
-        throw new InvalidContractException("Contract Given is Invalid");
+        else {
+            throw new InvalidContractException("Contract Given is Invalid");
+        }
     }
 
     @Override
@@ -56,8 +57,7 @@ public class ContractServiceImpl implements ContractService {
         throw new InvalidContractException("Invalid Contract Given");
     }
 
-    private static Contract dtoToContract(ContractDTO contractDTO, Optional<Contract> optionalContract) {
-        Contract contract = optionalContract.get();
+    private static Contract dtoToContract(ContractDTO contractDTO, Contract contract) {
         contract.setContractName(contractDTO.getContractName());
         contract.setContractType(contractDTO.getContractType());
         contract.setAttestedOn(contractDTO.getAttestedOn());

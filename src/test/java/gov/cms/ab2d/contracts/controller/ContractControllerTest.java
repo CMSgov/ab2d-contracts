@@ -18,7 +18,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -51,7 +50,7 @@ class ContractControllerTest {
     @Test
     void testList() throws Exception {
 
-        this.mockMvc.perform(get("/contract")
+        this.mockMvc.perform(get("/contracts")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
@@ -60,24 +59,19 @@ class ContractControllerTest {
         originalContract.setAttestedOn(OffsetDateTime.now());
         originalContract = contractRepository.save(originalContract);
 
-        this.mockMvc.perform(get("/contract")
+        this.mockMvc.perform(get("/contracts")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].contractNumber").value("Z0000"))
-                .andExpect(jsonPath("$.[0].contractName").value("test"))
-                .andExpect(jsonPath("$.[0].hpmsParentOrgId").value(42L));
+                .andExpect(jsonPath("$.[0].contractName").value("test"));
 
-        this.mockMvc.perform(put("/contract")
+        this.mockMvc.perform(put("/contracts")
                         .content("{\n" +
                                 "    \"created\": \"2022-11-21T10:25:02.851161-08:00\",\n" +
                                 "    \"modified\": \"2022-12-01T07:20:33.040608-08:00\",\n" +
                                 "    \"id\": " + originalContract.getId() +",\n" +
-                                "    \"contractNumber\": \"Z0001\",\n" +
+                                "    \"contractNumber\": \"Z0000\",\n" +
                                 "    \"contractName\": \"Z0001\",\n" +
-                                "    \"hpmsParentOrgId\": null,\n" +
-                                "    \"hpmsParentOrg\": null,\n" +
-                                "    \"hpmsOrgMarketingName\": null,\n" +
-                                "    \"updateMode\": \"NONE\",\n" +
                                 "    \"contractType\": \"NORMAL\",\n" +
                                 "    \"attestedOn\": \"2020-03-01T00:00:00-08:00\",\n" +
                                 "    \"testContract\": true,\n" +
@@ -87,24 +81,25 @@ class ContractControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        this.mockMvc.perform(get("/contract")
+        this.mockMvc.perform(get("/contracts")
                         .param("contractId", originalContract.getId().toString())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].contractNumber").value("Z0001"))
+                .andExpect(jsonPath("$.[0].contractNumber").value("Z0000"))
                 .andExpect(jsonPath("$.[0].contractName").value("Z0001"));
 
-        this.mockMvc.perform(get("/contract/Z0001")
+        this.mockMvc.perform(get("/contracts/Z0000")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].contractNumber").value("Z0001"))
-                .andExpect(jsonPath("$.[0].contractName").value("Z0001"));
+                .andExpect(jsonPath("$.contractNumber").value("Z0000"))
+                .andExpect(jsonPath("$.id").value(originalContract.getId()))
+                .andExpect(jsonPath("$.contractName").value("Z0001"));
 
-        this.mockMvc.perform(get("/contract/NotARealNumber")
+        this.mockMvc.perform(get("/contracts/NotARealNumber")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
 
-        this.mockMvc.perform(get("/contract")
+        this.mockMvc.perform(get("/contracts")
                         .param("contractId", "01010100")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
