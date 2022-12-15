@@ -1,7 +1,7 @@
 package gov.cms.ab2d.contracts.service;
 
+import gov.cms.ab2d.contracts.SpringBootApp;
 import gov.cms.ab2d.contracts.util.AB2DPostgresqlContainer;
-import gov.cms.ab2d.contracts.SpringBootTestApp;
 import gov.cms.ab2d.contracts.hmsapi.HPMSAttestation;
 import gov.cms.ab2d.contracts.hmsapi.HPMSOrganizationInfo;
 import org.junit.jupiter.api.AfterEach;
@@ -22,7 +22,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(classes = SpringBootTestApp.class)
+@SpringBootTest
 @TestPropertySource(locations = "/application.properties")
 @Testcontainers
 class MockedFetchTest {

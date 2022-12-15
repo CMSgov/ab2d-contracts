@@ -2,7 +2,6 @@ package gov.cms.ab2d.contracts.repository;
 
 import gov.cms.ab2d.contracts.model.Property;
 import java.util.Optional;
-import java.util.Properties;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 //TODO Delete once property service is released

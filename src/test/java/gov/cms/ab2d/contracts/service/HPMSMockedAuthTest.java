@@ -1,8 +1,8 @@
 package gov.cms.ab2d.contracts.service;
 
+import gov.cms.ab2d.contracts.SpringBootApp;
 import gov.cms.ab2d.contracts.util.AB2DPostgresqlContainer;
 import gov.cms.ab2d.eventclient.clients.SQSEventClient;
-import gov.cms.ab2d.contracts.SpringBootTestApp;
 import gov.cms.ab2d.contracts.hmsapi.HPMSAuthResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -25,16 +25,13 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
 import static org.springframework.http.HttpHeaders.COOKIE;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.REQUEST_TIMEOUT;
 
-@SpringBootTest(classes = SpringBootTestApp.class)
+@SpringBootTest
 @TestPropertySource(locations = "/application.properties")
 @Testcontainers
 class HPMSMockedAuthTest {

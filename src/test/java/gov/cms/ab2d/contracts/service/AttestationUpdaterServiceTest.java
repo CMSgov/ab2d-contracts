@@ -1,10 +1,10 @@
 package gov.cms.ab2d.contracts.service;
 
+import gov.cms.ab2d.contracts.SpringBootApp;
 import gov.cms.ab2d.contracts.repository.ContractRepository;
 import gov.cms.ab2d.contracts.util.AB2DPostgresqlContainer;
 import gov.cms.ab2d.contracts.model.Contract;
 import gov.cms.ab2d.eventclient.clients.SQSEventClient;
-import gov.cms.ab2d.contracts.SpringBootTestApp;
 import gov.cms.ab2d.contracts.hmsapi.HPMSOrganizationInfo;
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(classes = SpringBootTestApp.class)
+@SpringBootTest
 @TestPropertySource(locations = "/application.properties")
 @Testcontainers
 public class AttestationUpdaterServiceTest {
