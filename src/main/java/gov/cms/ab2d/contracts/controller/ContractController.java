@@ -1,15 +1,12 @@
 package gov.cms.ab2d.contracts.controller;
 
-import gov.cms.ab2d.contracts.model.Contract;
+import gov.cms.ab2d.contracts.model.ContractAPI;
 import gov.cms.ab2d.contracts.model.ContractDTO;
 import gov.cms.ab2d.contracts.service.ContractService;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -33,11 +30,9 @@ public class ContractController implements ContractAPI {
     }
 
     @Override
-    public List<ContractDTO> getContractByNumber(String contractNumber) {
+    public ContractDTO getContractByNumber(String contractNumber) {
         if (contractNumber != null) {
-            ArrayList<ContractDTO> contracts = new ArrayList<>();
-            contracts.add(contractService.getContractByContractNumber(contractNumber).toDTO());
-            return contracts;
+            return contractService.getContractByContractNumber(contractNumber).toDTO();
         }
         throw new InvalidContractParamException("Must supply contract information");
 
