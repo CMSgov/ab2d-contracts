@@ -5,10 +5,12 @@ plugins {
     id "org.sonarqube" version "3.3"
     id "gov.cms.ab2d.plugin" version "1.0"
     id 'maven-publish'
+    id 'org.cyclonedx.bom' version '1.7.2' apply true
 }
 
 allprojects {
     apply plugin: 'gov.cms.ab2d.plugin'
+    apply plugin: "org.cyclonedx.bom"
     dependencies {
         implementation 'org.springframework.boot:spring-boot-starter-quartz:2.7.6'
         implementation 'net.logstash.logback:logstash-logback-encoder:7.2'
@@ -29,6 +31,27 @@ allprojects {
         testImplementation 'org.testcontainers:junit-jupiter:1.17.6'
         testImplementation 'org.testcontainers:localstack:1.17.6'
         compileOnly 'org.projectlombok:lombok:1.18.24'
+    }
+
+    cyclonedxBom {
+        // includeConfigs is the list of configuration names to include when generating the BOM (leave empty to include every configuration)
+        includeConfigs = ["runtimeClasspath"]
+        // skipConfigs is a list of configuration names to exclude when generating the BOM
+        skipConfigs = ["compileClasspath", "testCompileClasspath"]
+        // Specified the type of project being built. Defaults to 'library'
+        projectType = "library"
+        // Specified the version of the CycloneDX specification to use. Defaults to 1.4.
+        schemaVersion = "1.4"
+        // Boms destination directory (defaults to build/reports)
+        destination = file("build/reports")
+        // The file name for the generated BOMs (before the file format suffix). Defaults to 'bom'
+        outputName = "bom"
+        // The file format generated, can be xml, json or all for generating both
+        outputFormat = "all"
+        // Exclude BOM Serial Number
+        includeBomSerialNumber = false
+        // Override component version
+        componentVersion = "2.0.0"
     }
 }
 
