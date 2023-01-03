@@ -1,6 +1,10 @@
 pipeline {
     environment {
         ARTIFACTORY_URL = credentials('ARTIFACTORY_URL')
+        
+        // HPMS key id and secret
+        HPMS_AUTH_KEY_ID = credentials('HPMS_AUTH_KEY_ID')
+        HPMS_AUTH_KEY_SECRET = credentials('HPMS_AUTH_KEY_SECRET')
     }
 
     agent {
