@@ -1,12 +1,10 @@
 package gov.cms.ab2d.contracts.quartz;
 
-import gov.cms.ab2d.contracts.repository.PropertiesRepository;
 import gov.cms.ab2d.contracts.service.AttestationUpdaterService;
 import gov.cms.ab2d.contracts.service.FeatureEngagement;
 import gov.cms.ab2d.properties.client.PropertiesClient;
 import gov.cms.ab2d.properties.client.PropertiesClientImpl;
 import gov.cms.ab2d.properties.client.PropertyNotFoundException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
@@ -15,7 +13,6 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 
 
 @Slf4j
-//@RequiredArgsConstructor
 @DisallowConcurrentExecution
 public class HPMSIngestJob extends QuartzJobBean {
     public static final String HPMS_INGESTION_ENGAGEMENT = "hpms.ingest.engaged";
