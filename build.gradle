@@ -24,7 +24,7 @@ allprojects {
         implementation 'org.liquibase:liquibase-core:4.17.2'
         implementation 'gov.cms.ab2d:ab2d-events-client:1.11.2'
         implementation 'gov.cms.ab2d:ab2d-contracts-client:1.0.0'
-        implementation 'gov.cms.ab2d:ab2d-properties-client:1.1.0'
+        implementation 'gov.cms.ab2d:ab2d-properties-client:1.1.3'
         implementation 'org.springframework.cloud:spring-cloud-starter-aws-messaging:2.2.6.RELEASE'
         implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
         testImplementation 'org.testcontainers:testcontainers:1.17.6'
