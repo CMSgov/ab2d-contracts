@@ -3,7 +3,7 @@ plugins {
     id 'org.springframework.boot' version '2.7.0'
     id 'com.jfrog.artifactory' version '4.27.1' apply false
     id "org.sonarqube" version "3.3"
-    id "gov.cms.ab2d.plugin" version "1.0"
+    id "gov.cms.ab2d.plugin" version "1.0.2"
     id 'maven-publish'
     id 'org.cyclonedx.bom' version '1.7.2' apply true
 }
