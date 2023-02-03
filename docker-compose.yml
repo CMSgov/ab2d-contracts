@@ -18,6 +18,21 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  localstack:
+    image: localstack/localstack:1.0.2
+    environment:
+      - AWS_DEFAULT_REGION=us-east-1
+      - EDGE_PORT=4566
+      - SERVICES=sqs
+    ports:
+      - '4566:4566'
+    volumes:
+      - tmp-volume:/opt/ab2d
+    healthcheck:
+      test: awslocal sqs list-queues
+      interval: 10s
+      timeout: 5s
+      retries: 40
   build:
     image: maven:3-openjdk-17
     working_dir: /usr/src/mymaven
@@ -27,18 +42,35 @@ services:
     volumes:
       - "${PWD}:/usr/src/mymaven"
       - "${HOME}/.m2:/root/.m2"
-# Uncomment this when running locally to start up localstack
-# When we update docker-compose to a version that supports profiles commenting this out will no longer be needed
-  localstack:
-    image: localstack/localstack:latest
-    profiles:
-      - "local"
+  contracts:
+    build:
+      context: ./
     environment:
-        - AWS_DEFAULT_REGION=us-east-1
-        - EDGE_PORT=4566
-        - SERVICES=sqs
+      - AB2D_DB_HOST=db
+      - AB2D_DB_PORT=5432
+      - AB2D_DB_DATABASE=ab2d
+      - AB2D_DB_SSL_MODE=allow
+      - AB2D_DB_USER=ab2d
+      - AB2D_DB_PASSWORD=ab2d
+      - AB2D_CLAIMS_SKIP_BILLABLE_PERIOD_CHECK=true
+      - AB2D_V2_ENABLED=true
+      - HPMS_INGEST_SCHEDULE=0 0/1 * * * ?
+      - AWS_SQS_URL=http://localstack:4566
+      - AWS_ACCESS_KEY_ID=invalid
+      - AWS_SECRET_KEY=invalid
+      - HPMS_AUTH_KEY_ID="${HPMS_AUTH_KEY_ID}"
+      - HPMS_AUTH_KEY_SECRET="${HPMS_AUTH_KEY_SECRET}"
+      - AB2D_HPMS_URL=${AB2D_HPMS_URL}
     ports:
-        - '4566:4566'
+      - '8070:8070'
+    depends_on:
+      db:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+    volumes:
+      - tmp-volume:/opt/ab2d
+
 # This needs a shared volume so that both the API and worker module can access the ndjson files being generated
 volumes:
   tmp-volume:

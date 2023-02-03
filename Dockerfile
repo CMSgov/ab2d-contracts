@@ -1,6 +1,13 @@
 FROM openjdk:17
 WORKDIR /usr/src/ab2d-contracts
-ADD build/libs/Ab2d-*-Contracts-Service.jar /usr/src/ab2d-contracts/ab2d-contracts.jar
+#JENKINS=build/libs/Ab2d-*-Contracts-Service.jar
+ADD build/libs/ab2d-contracts.jar* /usr/src/ab2d-contracts/ab2d-contracts.jar
+ADD build/libs/Ab2d-*-Contracts-Service.jar* /usr/src/ab2d-contracts/ab2d-contracts.jar
+
+
+#RUN #if [[ -f f"build/libs/Ab2d-*-Contracts-Service.jar" ]] ; then  FILE=build/libs/Ab2d-*-Contracts-Service.jar; else $FILE=build/libs/ab2d-contracts.jar; fi
+
+#ADD $FILE /usr/src/ab2d-contracts/ab2d-contracts.jar
 
 CMD java \
     -XX:+UseContainerSupport \
