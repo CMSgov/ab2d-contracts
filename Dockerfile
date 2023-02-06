@@ -1,6 +1,7 @@
 FROM openjdk:17
 WORKDIR /usr/src/ab2d-contracts
 #JENKINS=build/libs/Ab2d-*-Contracts-Service.jar
+RUN gradle build -x test & gradle jar --info build
 ADD build/libs/ab2d-contracts.jar* /usr/src/ab2d-contracts/ab2d-contracts.jar
 ADD build/libs/Ab2d-*-Contracts-Service.jar* /usr/src/ab2d-contracts/ab2d-contracts.jar
 
