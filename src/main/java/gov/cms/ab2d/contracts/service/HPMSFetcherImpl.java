@@ -1,11 +1,13 @@
 package gov.cms.ab2d.contracts.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cms.ab2d.contracts.hmsapi.HPMSAttestation;
+import gov.cms.ab2d.contracts.hmsapi.HPMSEnrollment;
 import gov.cms.ab2d.contracts.hmsapi.HPMSOrganizationInfo;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +28,10 @@ public class HPMSFetcherImpl extends AbstractHPMSService implements HPMSFetcher 
     private String hpmsBaseURI;
 
     private URI organizationBaseUri;
+
     private URI attestationBaseUri;
+
+    private URI enrollmentBaseUri;
 
     private final HPMSAuthService authService;
 
@@ -42,35 +47,55 @@ public class HPMSFetcherImpl extends AbstractHPMSService implements HPMSFetcher 
     private void buildURI() {
         organizationBaseUri = UriComponentsBuilder.fromUriString(hpmsBaseURI + hpmsBasePath + "/orgs/info").build().toUri();
         attestationBaseUri = UriComponentsBuilder.fromUriString(hpmsBaseURI + hpmsBasePath + "/contracts/status").build().toUri();
+        enrollmentBaseUri = UriComponentsBuilder.fromUriString(hpmsBaseURI + hpmsBasePath + "/enrollments").build().toUri();
     }
 
     @Override
-    public void retrieveSponsorInfo(Consumer<List<HPMSOrganizationInfo>> hpmsOrgCallback) {
-        Mono<List<HPMSOrganizationInfo>> orgInfoMono = webClient
+    public List<HPMSOrganizationInfo> retrieveSponsorInfo() {
+        Mono<Object[]> response = webClient
                 .get().uri(organizationBaseUri)
                 .headers(authService::buildAuthHeaders)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<>() {
-                });
-
-        orgInfoMono.subscribe(hpmsOrgCallback);
+                .bodyToMono(Object[].class);
+        Object[] objects = response.block();
+        ObjectMapper mapper = new ObjectMapper();
+        return Arrays.stream(objects)
+                .map(object -> mapper.convertValue(object, HPMSOrganizationInfo.class))
+                .toList();
     }
 
     @Override
-    public void retrieveAttestationInfo(Consumer<Set<HPMSAttestation>> hpmsAttestationCallback, List<String> contractIds) {
+    public Set<HPMSAttestation> retrieveAttestationInfo(List<String> contractIds) {
         Mono<Set<HPMSAttestation>> contractsMono = webClient
                 .get().uri(buildAttestationURI(contractIds))
                 .headers(authService::buildAuthHeaders)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
+        return contractsMono.block();
+    }
 
-        contractsMono.subscribe(hpmsAttestationCallback);
+    @Override
+    public Set<HPMSEnrollment> retrieveEnrollmentInfo(List<String> contractIds) {
+        Mono<Set<HPMSEnrollment>> contractsMono = webClient
+                .get().uri(buildEnrollmentURI(contractIds))
+                .headers(authService::buildAuthHeaders)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+        return contractsMono.block();
     }
 
     private URI buildAttestationURI(List<String>  contractIds) {
         return UriComponentsBuilder
                 .fromUri(attestationBaseUri)
+                .queryParam("contractId", contractIds)
+                .build().toUri();
+    }
+
+    private URI buildEnrollmentURI(List<String>  contractIds) {
+        return UriComponentsBuilder
+                .fromUri(enrollmentBaseUri)
                 .queryParam("contractId", contractIds)
                 .build().toUri();
     }

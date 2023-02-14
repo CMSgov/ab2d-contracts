@@ -26,6 +26,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
@@ -61,8 +62,8 @@ public class AttestationUpdaterServiceTest {
 
     @Test
     public void noNewContracts() {
-        List<Contract> result = aus.addNewContracts(Collections.emptyList());
-        assertTrue(result.isEmpty());
+        Contract result = aus.addNewContract(null);
+        assertNull(result);
     }
 
     @Test
@@ -71,17 +72,7 @@ public class AttestationUpdaterServiceTest {
         info.setParentOrgId(2);
         Contract contract = new Contract();
         contract.setHpmsParentOrgId(1L);
-        assertTrue(info.hasChanges(contract));
-    }
-
-    @Test
-    void updateCoverage() {
-        HPMSOrganizationInfo info = new HPMSOrganizationInfo();
-        info.setParentOrgId(2);
-        Contract contract = new Contract();
-        contract.setHpmsParentOrgId(1L);
-        info.updateContract(contract);
-        assertEquals(2L, (long) contract.getHpmsParentOrgId());
+        assertTrue(contract.hasChanges(info.getContractName(), info.getParentOrgId(), info.getParentOrgName(), info.getOrgMarketingName(), 0, 0));
     }
 
     @TestConfiguration

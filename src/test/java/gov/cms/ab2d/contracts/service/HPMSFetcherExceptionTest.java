@@ -1,6 +1,5 @@
 package gov.cms.ab2d.contracts.service;
 
-import gov.cms.ab2d.contracts.SpringBootApp;
 import gov.cms.ab2d.contracts.util.AB2DPostgresqlContainer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,14 +34,14 @@ class HPMSFetcherExceptionTest {
     @Test
     void invalidSponsorUrl() {
         Assertions.assertThrows(WebClientRequestException.class, () -> {
-            fetcher.retrieveSponsorInfo(null);
+            fetcher.retrieveSponsorInfo();
         });
     }
 
     @Test
     void invalidAttestationUrl() {
         Assertions.assertThrows(WebClientRequestException.class, () -> {
-            fetcher.retrieveAttestationInfo(null, null);
+            fetcher.retrieveAttestationInfo(null);
         });
     }
 }

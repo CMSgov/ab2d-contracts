@@ -1,6 +1,5 @@
 package gov.cms.ab2d.contracts.service;
 
-import gov.cms.ab2d.contracts.SpringBootApp;
 import gov.cms.ab2d.contracts.util.AB2DPostgresqlContainer;
 import gov.cms.ab2d.contracts.hmsapi.HPMSAttestation;
 import gov.cms.ab2d.contracts.hmsapi.HPMSOrganizationInfo;
@@ -18,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -52,26 +50,14 @@ class HPMSFetcherTest {
 
     @Test
     void retrieveSponsorInfoNull() {
-        Assertions.assertThrows(NullPointerException.class, () -> fetcher.retrieveSponsorInfo(null));
-    }
-
-    @Test
-    void retrieveAttestationInfoNullCallback() {
-        List<String> contracts = new ArrayList<>();
-        Assertions.assertThrows(NullPointerException.class, () -> fetcher.retrieveAttestationInfo(null, contracts));
-    }
-
-    @Test
-    void retrieveAttestationInfoNullContracts() {
-        Assertions.assertDoesNotThrow(() -> fetcher.retrieveAttestationInfo(this::processAttestations, null));
+        Assertions.assertDoesNotThrow(() -> fetcher.retrieveSponsorInfo());
     }
 
     @Test
     void retrieveAttestationInfo() {
         List<String> top6Contracts = retrieveTop6Contracts();
         lock = new CountDownLatch(1);
-        fetcher.retrieveAttestationInfo(this::processAttestations, top6Contracts);
-        waitForCallback();
+        attestations = fetcher.retrieveAttestationInfo(top6Contracts);
         assertNotNull(attestations);
         assertFalse(attestations.isEmpty());
         // E4744 is not returned by the API
@@ -79,12 +65,7 @@ class HPMSFetcherTest {
     }
 
     List<String> retrieveTop6Contracts() {
-        fetcher.retrieveSponsorInfo(this::processOrgInfo);
-        int retries = 0;
-        do {
-            waitForCallback();
-        } while (orgs == null && retries++ < 20);
-
+        orgs = fetcher.retrieveSponsorInfo();
         assertNotNull(orgs);
         assertFalse(orgs.isEmpty());
 
@@ -94,17 +75,9 @@ class HPMSFetcherTest {
         return top6Contracts;
     }
 
-    private void waitForCallback() {
-        try {
-            lock.await(3, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            fail();
-        }
-    }
-
     @SuppressWarnings("SameParameterValue")
     private List<String> extractTopContractIDs(int limit) {
-        List<String> retList = new ArrayList<>(3);
+        List<String> retList = new ArrayList<>(limit);
         final int sponsorSize = orgs.size();
         for (int idx = 0; idx < limit && idx < sponsorSize; idx++) {
             retList.add(orgs.get(idx).getContractId());
