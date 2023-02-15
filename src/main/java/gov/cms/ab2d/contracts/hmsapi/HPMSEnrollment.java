@@ -15,11 +15,11 @@ public class HPMSEnrollment {
     private String medicareEligible;
 
     public HPMSEnrollment(int enrollmentYear, int enrollmentMonth, String contractId, int totalEnrollment, int medicareEligible) {
-        this.enrollmentYear = "" + enrollmentYear;
-        this.enrollmentMonth = "" + enrollmentMonth;
+        this.enrollmentYear = String.valueOf(enrollmentYear);
+        this.enrollmentMonth = String.valueOf(enrollmentMonth);
         this.contractId = contractId;
-        this.totalEnrollment = "" + totalEnrollment;
-        this.medicareEligible = "" + medicareEligible;
+        this.totalEnrollment = String.valueOf(totalEnrollment);
+        this.medicareEligible = String.valueOf(medicareEligible);
     }
     public int getEnrollmentMonthInt() {
         return getInt(enrollmentMonth);
