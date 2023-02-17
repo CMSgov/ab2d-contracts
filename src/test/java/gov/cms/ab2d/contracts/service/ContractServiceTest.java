@@ -48,7 +48,7 @@ class ContractServiceTest {
         List<ContractDTO> contracts = service.getAllContracts();
         assertNotNull(contracts);
         assertEquals(0, contracts.size());
-        Contract originalContract = new Contract("Z0000", "test", 00l, "ORG", "Marketing");
+        Contract originalContract = new Contract("Z0000", "test", 00l, "ORG", "Marketing", 100, 95);
         contractRepository.save(originalContract);
 
         contracts = service.getAllContracts();

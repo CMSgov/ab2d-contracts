@@ -1,30 +1,35 @@
 package gov.cms.ab2d.contracts.service;
 
+import gov.cms.ab2d.contracts.hmsapi.HPMSEnrollment;
 import gov.cms.ab2d.contracts.repository.ContractRepository;
 import gov.cms.ab2d.contracts.model.Contract;
+import gov.cms.ab2d.contracts.utils.DateUtil;
 import gov.cms.ab2d.eventclient.clients.SQSEventClient;
 import gov.cms.ab2d.eventclient.config.Ab2dEnvironment;
 import gov.cms.ab2d.eventclient.events.SlackEvents;
 import gov.cms.ab2d.contracts.hmsapi.HPMSAttestation;
 import gov.cms.ab2d.contracts.hmsapi.HPMSOrganizationInfo;
 
-import java.util.ArrayList;
+import java.time.OffsetDateTime;
+import java.time.Period;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-
+import static gov.cms.ab2d.contracts.model.Contract.FORMATTER;
 import static gov.cms.ab2d.eventclient.events.SlackEvents.CONTRACT_CHANGED;
-
 
 @Primary
 @Service
+@Slf4j
 public class AttestationUpdaterServiceImpl implements AttestationUpdaterService {
 
     private static final int BATCH_SIZE = 100;
@@ -44,128 +49,175 @@ public class AttestationUpdaterServiceImpl implements AttestationUpdaterService 
         this.eventLogger = eventLogger;
     }
 
+    public Contract pullFullInformation(HPMSOrganizationInfo info) {
+        Contract contract = populateContract(info);
+        Set<HPMSEnrollment> enrollmentSet = hpmsFetcher.retrieveEnrollmentInfo(List.of(contract.getContractNumber()));
+        if (enrollmentSet != null && !enrollmentSet.isEmpty()) {
+            try {
+                Optional<HPMSEnrollment> enrollmentOpt = enrollmentSet.stream().findFirst();
+                if (enrollmentOpt.isPresent()) {
+                    HPMSEnrollment enrollment = enrollmentOpt.get();
+                    int dayDiffFromNow = timeDifference(enrollment.getEnrollmentYearInt(), enrollment.getEnrollmentMonthInt());
+                    if (dayDiffFromNow > 60) {
+                        contract.setTotalEnrollment(0);
+                        contract.setMedicareEligible(0);
+                    } else {
+                        contract.setTotalEnrollment(enrollment.getTotalEnrollmentInt());
+                        contract.setMedicareEligible(enrollment.getMedicareEligibleInt());
+                    }
+                }
+            } catch (Exception ex) {
+                log.error("Unable to get enrollment for contract: " + contract.getContractNumber());
+            }
+        }
+        try {
+            Set<HPMSAttestation> attestationSet = hpmsFetcher.retrieveAttestationInfo(List.of(contract.getContractNumber()));
+            if (attestationSet != null && !attestationSet.isEmpty()) {
+                Optional<HPMSAttestation> attestionOpt = attestationSet.stream().findFirst();
+                if (attestionOpt.isPresent()) {
+                    HPMSAttestation attestation = attestionOpt.get();
+                    if (attestation.isAttested()) {
+                        String dateWithTZ = attestation.getAttestationDate() + " " + DateUtil.getESTOffset();
+                        contract.setAttestedOn(OffsetDateTime.parse(dateWithTZ, FORMATTER));
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            log.error("Unable to get attestation for contract: " + contract.getContractNumber());
+        }
+        return contract;
+    }
+
+    static int timeDifference(int year, int month) {
+        if (month <= 0 || year <= 0) {
+            return 10_000;
+        }
+        OffsetDateTime enrollmentDt = OffsetDateTime.of(
+                year, month, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        OffsetDateTime now = OffsetDateTime.now();
+        Period period = Period.between(enrollmentDt.toLocalDate(), now.toLocalDate());
+        int yearDiff = period.getYears();
+        int monthDiff = period.getMonths();
+        int dayDiff = period.getDays();
+        return (yearDiff * 365) + (monthDiff * 30) + dayDiff;
+    }
+
+    Contract populateContract(HPMSOrganizationInfo info) {
+        Contract contract = new Contract();
+        contract.setContractNumber(info.getContractId());
+        if (info.getParentOrgId() != null) {
+            contract.setHpmsParentOrgId(info.getParentOrgId().longValue());
+        }
+        contract.setContractName(info.getContractName());
+        contract.setHpmsParentOrg(info.getParentOrgName());
+        contract.setHpmsOrgMarketingName(info.getOrgMarketingName());
+        return contract;
+    }
+
     @Override
     public void pollOrganizations() {
-        hpmsFetcher.retrieveSponsorInfo(this::processOrgInfo);
-    }
+        // Load the data from HPMS
+        Map<String, Contract> pulledContracts = retrieveAllContractsFromHPMS();
 
-    private void processOrgInfo(List<HPMSOrganizationInfo> orgInfo) {
+        // Retrieve the data from the database
         Map<String, Contract> existingMap = buildExistingContractMap();
 
-        // detect changed organizational information, specifically populating the new hpms fields
-        List<Contract> changedContracts = orgInfo.stream()
-                .filter(hpmsInfo -> existingMap.containsKey(hpmsInfo.getContractId()))
-                .map(this::updateContract)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-        if (!changedContracts.isEmpty()) {
-            List<Contract> updatedContracts = contractRepository.saveAll(changedContracts);
-            // Replace changed contracts in the existing map.  Fixes AB2D-4363.
-            updatedContracts.forEach(contract -> existingMap.put(contract.getContractNumber(), contract));
+        // Get the ones you don't want to update
+        List<Contract> onesNotToUpdate = existingMap.values().stream().filter(c -> !c.isAutoUpdatable()).toList();
+
+        // Remove from both lists ones you shouldn't be updating
+        for (Contract c : onesNotToUpdate) {
+            if (pulledContracts.containsKey(c.getContractNumber())) {
+                pulledContracts.remove(c.getContractNumber());
+            }
+            if (existingMap.containsKey(c.getContractNumber())) {
+                existingMap.remove(c.getContractNumber());
+            }
         }
 
-        // detect new Contracts
-        List<HPMSOrganizationInfo> newContracts = orgInfo.stream()
-                .filter(hpmsInfo -> !existingMap.containsKey(hpmsInfo.getContractId()))
-                .collect(Collectors.toList());
-        List<Contract> contractAttestList = addNewContracts(newContracts);
-
-        Map<String, HPMSOrganizationInfo> refreshed = buildRefreshedMap(orgInfo);
-        existingMap.forEach((contractId, contract) ->
-                considerContract(contractAttestList, contract, refreshed.get(contractId)));
-
-        batchAttestations(contractAttestList.stream().map(Contract::getContractNumber).collect(Collectors.toList()));
-    }
-
-    private Optional<Contract> updateContract(HPMSOrganizationInfo hpmsInfo) {
-        Optional<Contract> contractHolder = contractRepository.findContractByContractNumber(hpmsInfo.getContractId());
-        if (contractHolder.isEmpty())
-            return contractHolder;
-
-        Contract contract = contractHolder.get();
-        return contract.isAutoUpdatable() && hpmsInfo.hasChanges(contract) ?
-                Optional.of(hpmsInfo.updateContract(contract)) : Optional.empty();
-    }
-
-    // Limit the size of the request to BATCH_SIZE, avoiding URLs that are too long and keeping the burden down
-    // on the invoked service.
-    private void batchAttestations(List<String> contractAttestList) {
-        final int size = contractAttestList.size();
-        int startIdx = 0;
-        for (; startIdx < size - BATCH_SIZE; startIdx += BATCH_SIZE) {
-            List<String> currentChunk = contractAttestList.subList(startIdx, startIdx + BATCH_SIZE);
-            processAttestations(currentChunk);
+        // Get contracts that were not updated and make sure their attestation is removed
+        for (Contract c : existingMap.values()) {
+            if (!pulledContracts.containsKey(c.getContractNumber())) {
+                c.setAttestedOn(null);
+                contractRepository.save(c);
+            }
         }
-
-        // process the remainder (if any) - i.e. smaller than a batch
-        if (size % BATCH_SIZE != 0) {
-            List<String> currentChunk = contractAttestList.subList(startIdx, size);
-            processAttestations(currentChunk);
+        // Get the new contracts & updated contracts
+        for (Contract contract : pulledContracts.values()) {
+            if (!existingMap.containsKey(contract.getContractNumber())) {
+                addNewContract(contract);
+            } else {
+                updateContract(contract, existingMap.get(contract.getContractNumber()));
+            }
         }
     }
 
-    private void processAttestations(List<String> currentChunk) {
-        hpmsFetcher.retrieveAttestationInfo(this::processContracts, currentChunk);
+    public Map<String, Contract> retrieveAllContractsFromHPMS() {
+        // Load the data from HPMS
+        List<HPMSOrganizationInfo> orgInfo = hpmsFetcher.retrieveSponsorInfo();
+
+        // If we don't get the data, return and don't do the updates
+        if (orgInfo == null || orgInfo.isEmpty()) {
+            return new HashMap<>();
+        }
+        Map<String, Contract> pulledContracts = new HashMap<>();
+        for (HPMSOrganizationInfo org : orgInfo) {
+            pulledContracts.put(org.getContractId(), pullFullInformation(org));
+        }
+        return pulledContracts;
     }
 
-    private void processContracts(Set<HPMSAttestation> contractHolder) {
-        Map<String, Contract> existingMap = buildExistingContractMap();
-        contractHolder
-                .forEach(attest -> updateContractIfChanged(attest, existingMap.get(attest.getContractId())));
-    }
-
-    private void updateContractIfChanged(HPMSAttestation attest, Contract contract) {
-        if (contract.updateAttestation(attest.isAttested(), attest.getAttestationDate())) {
-            String msg = CONTRACT_CHANGED + " *Changed Contract*\n\nName: " + contract.getContractName() + "\n"
-                    + "Number: " + contract.getContractNumber() + "\n"
-                    + "HPMS Attested On: " + attest.getAttestationDate() + "\n"
-                    + "Contract Attested On: " + contract.getAttestedOn() + "\n";
+    private void updateContract(Contract newContract, Contract oldContract) {
+        if (contractUpdated(oldContract, newContract)) {
+            String msg = CONTRACT_CHANGED + " *Changed Contract*\n\nName: " + oldContract.getContractName() + "\n"
+                    + "Number: " + oldContract.getContractNumber() + "\n"
+                    + "HPMS Attested On: " + newContract.getAttestedOn() + "\n"
+                    + "Contract Attested On: " + oldContract.getAttestedOn() + "\n";
             if (eventLogger != null) {
                 eventLogger.alert(msg, Ab2dEnvironment.ALL);
             }
-            contractRepository.save(contract);
+        }
+        oldContract.setAttestedOn(newContract.getAttestedOn());
+        oldContract.setContractName(newContract.getContractName());
+        oldContract.setHpmsOrgMarketingName(newContract.getHpmsOrgMarketingName());
+        oldContract.setHpmsParentOrgId(newContract.getHpmsParentOrgId());
+        oldContract.setHpmsParentOrg(newContract.getHpmsParentOrg());
+        oldContract.setTotalEnrollment(newContract.getTotalEnrollment());
+        oldContract.setMedicareEligible(newContract.getMedicareEligible());
+
+        contractRepository.save(oldContract);
+    }
+
+    private boolean contractUpdated(Contract oldContract, Contract newContract) {
+        if (oldContract == null || newContract == null) {
+            return false;
+        }
+        if (newContract.hasAttestation() != oldContract.hasAttestation()) {
+            return true;
+        }
+        if (! newContract.hasAttestation() && ! oldContract.hasAttestation()) {
+            return false;
+        }
+        if (newContract.getAttestedOn().isEqual(oldContract.getAttestedOn())) {
+            return false;
+        } else {
+            return true;
         }
     }
 
-    List<Contract> addNewContracts(List<HPMSOrganizationInfo> newContracts) {
-        if (newContracts.isEmpty()) {
-            return new ArrayList<>();
-        }
-        newContracts.forEach(c -> {
-                String msg = SlackEvents.CONTRACT_ADDED + " *New Contract*\n\nId: " + c.getContractId() + "\n"
-                        + "Name: " + c.getContractName() + "\n"
-                        + "Id: " + c.getContractId() + "\n"
-                        + "Org: " + c.getOrgMarketingName() + "\n";
-                if (eventLogger != null) {
-                    eventLogger.alert(msg, Ab2dEnvironment.ALL);
-                }
-            }
-        );
-        return newContracts.stream().map(this::sponsorAdd).collect(Collectors.toList());
-    }
-
-    private Contract sponsorAdd(HPMSOrganizationInfo hpmsInfo) {
-        return contractRepository.save(hpmsInfo.build());
-    }
-
-    private void considerContract(List<Contract> contractAttestList, Contract contract,
-                                  HPMSOrganizationInfo hpmsOrganizationInfo) {
-        // Pass on contracts that are marked to be left alone.
-        if (!contract.isAutoUpdatable()) {
-            return;
+    Contract addNewContract(Contract newContract) {
+        if (newContract == null) {
+            return null;
         }
 
-        if (hpmsOrganizationInfo == null) {
-            // Missing in refresh, need to update as having no attestation.
-            if (contract.hasAttestation()) {
-                contract.clearAttestation();
-                contractRepository.save(contract);
-            }
-            return;
+        String msg = SlackEvents.CONTRACT_ADDED + " *New Contract*\n\nId: " + newContract.getContractNumber() + "\n"
+                        + "Name: " + newContract.getContractName() + "\n"
+                        + "Parent Org: " + newContract.getHpmsParentOrg() + "\n"
+                        + "Org: " + newContract.getHpmsOrgMarketingName() + "\n";
+        if (eventLogger != null) {
+            eventLogger.alert(msg, Ab2dEnvironment.ALL);
         }
-
-        contractAttestList.add(contract);
+        return contractRepository.save(newContract);
     }
 
     private Map<String, Contract> buildExistingContractMap() {
@@ -174,11 +226,5 @@ public class AttestationUpdaterServiceImpl implements AttestationUpdaterService 
         existingMap = new HashMap<>();
         existing.forEach(contract -> existingMap.put(contract.getContractNumber(), contract));
         return existingMap;
-    }
-
-    private Map<String, HPMSOrganizationInfo> buildRefreshedMap(List<HPMSOrganizationInfo> orgInfo) {
-        Map<String, HPMSOrganizationInfo> refreshed = new HashMap<>();
-        orgInfo.forEach(hpmsOrg -> refreshed.put(hpmsOrg.getContractId(), hpmsOrg));
-        return refreshed;
     }
 }

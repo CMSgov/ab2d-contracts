@@ -55,7 +55,7 @@ class ContractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
 
-        Contract originalContract = new Contract("Z0000", "test", 42l, "ORG", "Marketing");
+        Contract originalContract = new Contract("Z0000", "test", 42l, "ORG", "Marketing", 100, 95);
         originalContract.setAttestedOn(OffsetDateTime.now());
         originalContract = contractRepository.save(originalContract);
 

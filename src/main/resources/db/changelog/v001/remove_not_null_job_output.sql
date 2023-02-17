@@ -1,1 +1,0 @@
-ALTER TABLE job_output ALTER COLUMN fhir_resource_type DROP NOT NULL;
