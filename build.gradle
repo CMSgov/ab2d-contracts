@@ -8,6 +8,9 @@ plugins {
     id 'org.cyclonedx.bom' version '1.7.4' apply true
 }
 
+version = 1.0.1
+group = "gov.cms.ab2d"
+
 allprojects {
     apply plugin: 'gov.cms.ab2d.plugin'
     apply plugin: "org.cyclonedx.bom"
