@@ -17,7 +17,7 @@ allprojects {
         implementation 'org.springframework.boot:spring-boot-starter-quartz:2.7.6'
         implementation 'net.logstash.logback:logstash-logback-encoder:7.2'
         implementation 'org.springframework.boot:spring-boot-starter-webflux:2.7.6'
-        testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.6'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test:3.0.6'
         testImplementation 'org.mockito:mockito-inline:5.2.0'
         implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.6'
         implementation 'org.springframework.boot:spring-boot-starter-validation:2.7.6'
