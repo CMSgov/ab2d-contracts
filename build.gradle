@@ -32,7 +32,7 @@ allprojects {
         testImplementation 'org.testcontainers:testcontainers:1.17.6'
         testImplementation 'org.testcontainers:postgresql:1.17.6'
         testImplementation 'org.testcontainers:junit-jupiter:1.17.6'
-        testImplementation 'org.testcontainers:localstack:1.17.6'
+        testImplementation 'org.testcontainers:localstack:1.18.1'
         testImplementation 'org.projectlombok:lombok:1.18.22'
         compileOnly 'org.projectlombok:lombok:1.18.26'
         implementation(platform(annotationProcessor("org.projectlombok:lombok:1.18.26")))
