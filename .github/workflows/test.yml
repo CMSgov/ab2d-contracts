@@ -1,0 +1,81 @@
+name: Build and Test
+
+
+on:
+  push:
+    branches:
+      - 'test/*'
+  pull_request:
+    branches:
+      - 'test/*'
+
+env:
+  ARTIFACTORY_URL: ${{ secrets.ARTIFACTORY_URL }}
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+
+      - name: Set Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.4.2
+      - run: gradle build --refresh-dependencies --debug # just test build configuration
+        env:
+          ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
+          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+          ARTIFACTORY_URL: ${{ secrets.ARTIFACTORY_URL }}
+          TEST_VAR: ${{ env.TEST_VAR }}
+          REPO_SECRET: ${{ secrets.REPO_SECRET }}
+      
+      - name: Do tests
+        run: gradle clean test --info build
+        env:
+          ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
+          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+          ARTIFACTORY_URL: ${{ secrets.ARTIFACTORY_URL }}
+
+      - name: Build Jar
+        run: gradle jar --info build
+        env:
+          ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
+          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+          ARTIFACTORY_URL: ${{ secrets.ARTIFACTORY_URL }}
+
+      - name: SonarQube Analysis
+        run: gradle sonarqube -Dsonar.projectKey=ab2d-contracts -Dsonar.host.url=https://sonarqube.cloud.cms.gov
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
+          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+          ARTIFACTORY_URL: ${{ secrets.ARTIFACTORY_URL }}          
+
+      - name: Quality Gate Check
+        run: |
+          status=$(curl -s -u ${{ secrets.SONAR_TOKEN }}: "https://sonarqube.cloud.cms.gov/api/qualitygates/project_status?projectKey=ab2d-contracts" | jq -r .projectStatus.status)
+          echo $status
+          if [ "$status" != "OK" ]; then
+            echo "Quality Gate failed"
+            exit 1
+          fi
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: SBOM
+        run: gradle cyclonedxBom
+        env:
+          ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
+          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+          ARTIFACTORY_URL: ${{ secrets.ARTIFACTORY_URL }}
+
