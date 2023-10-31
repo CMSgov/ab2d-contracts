@@ -20,4 +20,7 @@ ALTER TABLE ONLY contract.contract
 ALTER TABLE ONLY contract.contract
     ADD CONSTRAINT contract_pkey PRIMARY KEY (id);
 
-CREATE SEQUENCE hibernate_sequence START 1;
+CREATE SEQUENCE IF NOT EXISTS contract_seq START 1 INCREMENT BY 50;
+
+select setval('contract_seq', (SELECT MAX(id) FROM contract.contract));
+ALTER TABLE contract.contract ALTER COLUMN id SET DEFAULT nextval('contract_seq');
