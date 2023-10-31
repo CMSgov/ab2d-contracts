@@ -7,10 +7,12 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"gov.cms.ab2d.contracts", "gov.cms.ab2d.eventclient.clients"})
-@EntityScan(basePackages = {"gov.cms.ab2d.contracts"})
+@ComponentScan(basePackages = {"gov.cms.ab2d.contracts.*", "gov.cms.ab2d.contracts.model.*", "gov.cms.ab2d.eventclient.clients.*"})
+@EntityScan(basePackages = {"gov.cms.ab2d.contracts.*", "gov.cms.ab2d.contracts.model.*"})
+@EnableJpaRepositories(basePackages = {"gov.cms.ab2d.contracts.*", "gov.cms.ab2d.contracts.model.*"})
 @PropertySource("classpath:application.properties")
 @Import({HPMSIngestQuartzSetup.class})
 public class SpringBootApp {

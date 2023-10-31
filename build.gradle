@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version "2.7.6"
+    id 'org.springframework.boot' version "3.1.4"
     id 'com.jfrog.artifactory' version '4.33.1' apply false
     id "org.sonarqube" version "4.1.0.3113"
     id "gov.cms.ab2d.plugin" version "1.0.2"
@@ -11,22 +11,28 @@ plugins {
 version="1.0.1"
 group = "gov.cms.ab2d"
 
+ext {
+    springBootVersion='3.1.4'
+    springCloudVersion='2022.0.3'
+}
+
 allprojects {
     apply plugin: "org.cyclonedx.bom"
     dependencies {
-        implementation 'org.springframework.boot:spring-boot-starter-quartz:2.7.6'
+        implementation "org.springframework.boot:spring-boot-starter-quartz:${springBootVersion}"
         implementation 'net.logstash.logback:logstash-logback-encoder:7.3'
-        implementation 'org.springframework.boot:spring-boot-starter-webflux:2.7.6'
-        testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.6'
+        implementation "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}"
+        testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
         testImplementation 'org.mockito:mockito-inline:5.2.0'
-        implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.6'
-        implementation 'org.springframework.boot:spring-boot-starter-validation:2.7.6'
-        implementation 'org.springframework.boot:spring-boot-starter-web:2.7.6'
+        implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
+        implementation "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}"
+        implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
         implementation 'org.postgresql:postgresql:42.6.0'
         implementation 'org.liquibase:liquibase-core:4.22.0'
         implementation 'gov.cms.ab2d:ab2d-events-client:1.11.7'
         implementation 'gov.cms.ab2d:ab2d-contracts-client:1.1.2'
         implementation 'gov.cms.ab2d:ab2d-properties-client:1.1.8'
+        // implementation "org.springframework.cloud:spring-cloud-aws-messaging:${springCloudVersion}"
         implementation 'org.springframework.cloud:spring-cloud-starter-aws-messaging:2.2.6.RELEASE'
         implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
         testImplementation 'org.testcontainers:testcontainers:1.18.1'
