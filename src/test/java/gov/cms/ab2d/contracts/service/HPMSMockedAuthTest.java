@@ -13,14 +13,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.remoting.RemoteTimeoutException;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
+import gov.cms.ab2d.contracts.service.HPMSRemoteTimeoutException;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -96,7 +95,7 @@ class HPMSMockedAuthTest {
         // This is to test when HMPS is completely down so we don't get any response.
         try (MockedStatic<WebClient> webClientStatic = Mockito.mockStatic(WebClient.class)) {
             client.authRequestTimeout(mockedWebClient, webClientStatic, nullBody);
-            assertThrows(RemoteTimeoutException.class, () -> authService.buildAuthHeaders(headers));
+            assertThrows(HPMSRemoteTimeoutException.class, () -> authService.buildAuthHeaders(headers));
         }
     }
 
