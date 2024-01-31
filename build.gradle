@@ -11,6 +11,10 @@ plugins {
 version="1.0.1"
 group = "gov.cms.ab2d"
 
+ext {
+    springCloudAwsVersion = '2.4.4'
+}
+
 allprojects {
     apply plugin: "org.cyclonedx.bom"
     dependencies {
@@ -24,10 +28,14 @@ allprojects {
         implementation 'org.springframework.boot:spring-boot-starter-web:2.7.6'
         implementation 'org.postgresql:postgresql:42.6.0'
         implementation 'org.liquibase:liquibase-core:4.22.0'
-        implementation 'gov.cms.ab2d:ab2d-events-client:1.11.7'
-        implementation 'gov.cms.ab2d:ab2d-contracts-client:1.1.2'
-        implementation 'gov.cms.ab2d:ab2d-properties-client:1.1.8'
-        implementation 'org.springframework.cloud:spring-cloud-starter-aws-messaging:2.2.6.RELEASE'
+        implementation 'gov.cms.ab2d:ab2d-events-client:1.12.1'
+        implementation 'gov.cms.ab2d:ab2d-contracts-client:1.2.1'
+        implementation 'gov.cms.ab2d:ab2d-properties-client:1.2.1'
+        implementation "io.awspring.cloud:spring-cloud-aws-dependencies:$springCloudAwsVersion"
+        implementation "io.awspring.cloud:spring-cloud-aws-core:${springCloudAwsVersion}"
+        implementation "io.awspring.cloud:spring-cloud-aws-autoconfigure:${springCloudAwsVersion}"
+        implementation "io.awspring.cloud:spring-cloud-starter-aws:${springCloudAwsVersion}"
+        implementation "io.awspring.cloud:spring-cloud-aws-messaging:${springCloudAwsVersion}"
         implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
         testImplementation 'org.testcontainers:testcontainers:1.18.1'
         testImplementation 'org.testcontainers:postgresql:1.18.1'
