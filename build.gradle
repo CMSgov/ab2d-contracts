@@ -28,7 +28,7 @@ allprojects {
         implementation 'org.springframework.boot:spring-boot-starter-web:2.7.6'
         implementation 'org.postgresql:postgresql:42.6.0'
         implementation 'org.liquibase:liquibase-core:4.22.0'
-        implementation 'gov.cms.ab2d:ab2d-events-client:1.12.5'
+        implementation 'gov.cms.ab2d:ab2d-events-client:1.12.6'
         implementation 'gov.cms.ab2d:ab2d-contracts-client:1.2.3'
         implementation 'gov.cms.ab2d:ab2d-properties-client:1.2.3'
         implementation "io.awspring.cloud:spring-cloud-aws-dependencies:$springCloudAwsVersion"
