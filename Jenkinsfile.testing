@@ -1,6 +1,6 @@
 pipeline {
     environment {
-        ARTIFACTORY_URL = credentials('ARTIFACTORY_URL')
+        ARTIFACTORY_URL = credentials('ARTIFACTORY_URL'
         
         // HPMS key id and secret
         HPMS_AUTH_KEY_ID = credentials('HPMS_AUTH_KEY_ID')
@@ -12,7 +12,7 @@ pipeline {
     }
 
     tools {
-        gradle "gradle-7.2"
+        gradle "gradle-7.5"
         jdk 'openjdk17'
     }
 
