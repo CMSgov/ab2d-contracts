@@ -39,7 +39,7 @@ jobs:
             SONAR_TOKEN=/sonarqube/token
 
       - name: Build files
-        run: gradle build -x test \
+        run: gradle build -x test --info \
               -Dusername="${ARTIFACTORY_USER}" \
               -Dpassword="${ARTIFACTORY_PASSWORD}" \
               -Drepository_url="${ARTIFACTORY_URL}"
