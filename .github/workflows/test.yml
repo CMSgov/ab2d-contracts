@@ -39,22 +39,25 @@ jobs:
             SONAR_TOKEN=/sonarqube/token
 
       - name: Build files
-        run: gradle build -x test --info \
-              -Dusername="${ARTIFACTORY_USER}" \
-              -Dpassword="${ARTIFACTORY_PASSWORD}" \
-              -Drepository_url="${ARTIFACTORY_URL}"
-        
+        run: |
+          gradle build -x test --info \
+            -Dusername="${{ env.ARTIFACTORY_USER }}" \
+            -Dpassword="${{ env.ARTIFACTORY_PASSWORD }}" \
+            -Drepository_url="${{ env.ARTIFACTORY_URL }}"
+
       - name: Do tests
-        run: gradle clean test --info build \
-              -Dusername="${ARTIFACTORY_USER}" \
-              -Dpassword="${ARTIFACTORY_PASSWORD}" \
-              -Drepository_url="${ARTIFACTORY_URL}"        
+        run: |
+          gradle clean test --info build \
+            -Dusername="${{ env.ARTIFACTORY_USER }}" \
+            -Dpassword="${{ env.ARTIFACTORY_PASSWORD }}" \
+            -Drepository_url="${{ env.ARTIFACTORY_URL }}"     
 
       - name: Build Jar
-        run: gradle jar --info build \
-              -Dusername="${ARTIFACTORY_USER}" \
-              -Dpassword="${ARTIFACTORY_PASSWORD}" \
-              -Drepository_url="${ARTIFACTORY_URL}"
+        run: |
+          gradle jar --info build \
+            -Dusername="${{ env.ARTIFACTORY_USER }}" \
+            -Dpassword="${{ env.ARTIFACTORY_PASSWORD }}" \
+            -Drepository_url="${{ env.ARTIFACTORY_URL }}"
         
       - name: SonarQube Quality Gate check
         id: sonarqube-quality-gate-check
