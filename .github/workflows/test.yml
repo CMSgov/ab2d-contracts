@@ -41,19 +41,17 @@ jobs:
         with:
           gradle-version: '7.5'
 
-      - name: Debug Gradle Properties
-        run: |
-          gradle properties --info \
-            -Dusername="${ARTIFACTORY_USER}" \
-            -Dpassword="${ARTIFACTORY_PASSWORD}" \
-            -Drepository_url="${ARTIFACTORY_URL}"          
+      - name: Debug ARTIFACTORY_URL
+        run: echo "ARTIFACTORY_URL=${ARTIFACTORY_URL}"
+        env:
+          ARTIFACTORY_URL: ${{ env.ARTIFACTORY_URL }}
 
-      - name: Build files
-        run: |
-          gradle build -x test --info \
-            -Dusername="${ARTIFACTORY_USER}" \
-            -Dpassword="${ARTIFACTORY_PASSWORD}" \
-            -Drepository_url="${ARTIFACTORY_URL}"
+#      - name: Build files
+#        run: |
+#          gradle build -x test --info \
+#            -Dusername="${ARTIFACTORY_USER}" \
+#            -Dpassword="${ARTIFACTORY_PASSWORD}" \
+#            -Drepository_url="${ARTIFACTORY_URL}"
 
       - name: Do tests
         run: |
