@@ -35,6 +35,12 @@ jobs:
             ARTIFACTORY_PASSWORD=/artifactory/password
             SONAR_HOST_URL=/sonarqube/url
             SONAR_TOKEN=/sonarqube/token
+            
+      - name: Export ARTIFACTORY variables
+        run: |
+          echo "ARTIFACTORY_URL=${ARTIFACTORY_URL}" >> $GITHUB_ENV
+          echo "ARTIFACTORY_USER=${ARTIFACTORY_USER}" >> $GITHUB_ENV
+          echo "ARTIFACTORY_PASSWORD=${ARTIFACTORY_PASSWORD}" >> $GITHUB_ENV
 
       - name: Set up Gradle
         uses: gradle/gradle-build-action@v2
@@ -42,26 +48,17 @@ jobs:
           gradle-version: '7.5'
 
 
-#      - name: Build files
-#        run: |
-#          gradle build -x test --info \
-#            -Dusername="${ARTIFACTORY_USER}" \
-#            -Dpassword="${ARTIFACTORY_PASSWORD}" \
-#            -Dartifactory_contextUrl="${ARTIFACTORY_URL}"
+      - name: Build files
+        run: |
+          gradle build -x test --info 
 
       - name: Do tests
         run: |
-          gradle clean test --info build \
-            -Dusername="${ARTIFACTORY_USER}" \
-            -Dpassword="${ARTIFACTORY_PASSWORD}" \
-            -Dartifactory_contextUrl="${ARTIFACTORY_URL}"   
+          gradle clean test --info build 
 
       - name: Build Jar
         run: |
-          gradle jar --info build \
-            -Dusername="${ARTIFACTORY_USER}" \
-            -Dpassword="${ARTIFACTORY_PASSWORD}" \
-            -Dartifactory_contextUrl="${ARTIFACTORY_URL}"
+          gradle jar --info build 
         
       - name: SonarQube Quality Gate check
         id: sonarqube-quality-gate-check
