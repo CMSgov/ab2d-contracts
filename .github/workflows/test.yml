@@ -11,6 +11,9 @@ jobs:
     runs-on: self-hosted
     env:
       ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      DEPLOYMENT_ENV: ${{ vars[format('{0}_DEPLOYMENT_ENV', inputs.environment)] }}
+      
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -20,11 +23,6 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
-
-      - name: Set up Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: '8.10'
 
       - name: Set env vars from AWS params
         uses: cmsgov/ab2d-bcda-dpc-platform/actions/aws-params-env-action@main
@@ -38,26 +36,31 @@ jobs:
             SONAR_HOST_URL=/sonarqube/url
             SONAR_TOKEN=/sonarqube/token
 
+      - name: Set up Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: '7.5'
+
       - name: Build files
         run: |
           gradle build -x test --info \
-            -Dusername="${{ env.ARTIFACTORY_USER }}" \
-            -Dpassword="${{ env.ARTIFACTORY_PASSWORD }}" \
-            -Drepository_url="${{ env.ARTIFACTORY_URL }}"
+            -Dusername="${{ ARTIFACTORY_USER }}" \
+            -Dpassword="${{ ARTIFACTORY_PASSWORD }}" \
+            -Drepository_url="${{ ARTIFACTORY_URL }}"
 
       - name: Do tests
         run: |
           gradle clean test --info build \
-            -Dusername="${{ env.ARTIFACTORY_USER }}" \
-            -Dpassword="${{ env.ARTIFACTORY_PASSWORD }}" \
-            -Drepository_url="${{ env.ARTIFACTORY_URL }}"     
+            -Dusername="${{ ARTIFACTORY_USER }}" \
+            -Dpassword="${{ ARTIFACTORY_PASSWORD }}" \
+            -Drepository_url="${{ ARTIFACTORY_URL }}"     
 
       - name: Build Jar
         run: |
           gradle jar --info build \
-            -Dusername="${{ env.ARTIFACTORY_USER }}" \
-            -Dpassword="${{ env.ARTIFACTORY_PASSWORD }}" \
-            -Drepository_url="${{ env.ARTIFACTORY_URL }}"
+            -Dusername="${{ ARTIFACTORY_USER }}" \
+            -Dpassword="${{ ARTIFACTORY_PASSWORD }}" \
+            -Drepository_url="${{ ARTIFACTORY_URL }}"
         
       - name: SonarQube Quality Gate check
         id: sonarqube-quality-gate-check
