@@ -68,11 +68,10 @@ jobs:
           gradle jar --info build 
         
       - name: SonarQube Analysis
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           gradle sonarqube \
-            -Dsonar.projectKey=ab2d-contracts
+            -Dsonar.projectKey=ab2d-contracts \ 
+            -Dsonar.host.url=$SONAR_HOST_URL
 
       - name: Quality Gate
         id: quality-gate
