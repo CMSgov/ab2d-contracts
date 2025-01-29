@@ -5,7 +5,7 @@ set -e # Turn on exit on error
 # Set default AWS region and tag
 
 export AWS_DEFAULT_REGION="us-east-1"
-export IMAGE_TAG="contract-service"
+export IMAGE_TAG="contracts-service"
 
 
 
