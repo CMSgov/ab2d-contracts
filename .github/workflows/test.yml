@@ -67,9 +67,20 @@ jobs:
         run: |
           gradle jar --info build 
         
-      - name: SonarQube Quality Gate check
-        id: sonarqube-quality-gate-check
-        uses: sonarsource/sonarqube-quality-gate-action@master
+      - name: SonarQube Analysis
+        env:
+          ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
+          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          gradle sonarqube \
+            -Dsonar.projectKey=ab2d-contracts \
+            -Dsonar.host.url=https://sonarqube.cloud.cms.gov \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+      - name: Quality Gate
+        id: quality-gate
+        uses: sonarsource/sonarcloud-github-action@v2
         with:
-          scanMetadataReportFile: build/sonar/report-task.txt
-        timeout-minutes: 5
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        timeout-minutes: 10
