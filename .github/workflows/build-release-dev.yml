@@ -1,4 +1,4 @@
-name: build-and-release-dev
+name: build-and-release-dev-contracts
 
 on: workflow_dispatch
 
