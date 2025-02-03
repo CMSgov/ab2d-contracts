@@ -77,9 +77,7 @@ jobs:
         run: |
           gradle sonar
 
-      - name: Quality Gate
-        id: quality-gate
-        uses: sonarsource/sonarcloud-github-action@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-        timeout-minutes: 10
+      - name: SonarQube Quality Gate check
+        id: sonarqube-quality-gate-check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
