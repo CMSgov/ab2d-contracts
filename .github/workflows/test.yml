@@ -75,9 +75,7 @@ jobs:
         
       - name: SonarQube Analysis
         run: |
-          gradle sonar \
-            -Dsonar.projectKey=ab2d-contracts \ 
-            -Dsonar.host.url=$SONAR_HOST_URL
+          gradle sonar
 
       - name: Quality Gate
         id: quality-gate
