@@ -68,6 +68,10 @@ jobs:
       - name: Build Jar
         run: |
           gradle jar --info build 
+
+      - name: Gradle task
+        run: |
+          gradle task
         
       - name: SonarQube Analysis
         run: |
