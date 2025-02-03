@@ -76,7 +76,4 @@ jobs:
       - name: SonarQube Analysis
         run: |
           gradle sonar
-
-      - name: SonarQube Quality Gate check
-        id: sonarqube-quality-gate-check
-        timeout-minutes: 5
+          
