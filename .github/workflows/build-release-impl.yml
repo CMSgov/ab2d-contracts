@@ -1,10 +1,6 @@
 name: build-and-release-impl
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - 'main'
+on: workflow_dispatch
 
 jobs:
   release:
@@ -46,11 +42,11 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-region: us-east-1
-          role-to-assume: arn:aws:iam::${{ vars.IMPL_ACCOUNT_NUMBER }}:role/delegatedadmin/developer/github-actions-runner-role
+          role-to-assume: arn:aws:iam::${{ secrets.IMPL_ACCOUNT }}:role/delegatedadmin/developer/ab2d-test-github-actions
 
       - name: Build Docker Image
         env:
-          ACCOUNT_NUMBER: ${{ vars.IMPL_ACCOUNT_NUMBER }}
+          ACCOUNT_NUMBER: ${{ secrets.IMPL_ACCOUNT_NUMBER }}
           ECR_REPO_ENV: "ab2d-impl-services"
           AWS_REGION: "us-east-1"
         run: ./scripts/github-actions-build-docker-image.sh
