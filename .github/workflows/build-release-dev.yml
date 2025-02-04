@@ -1,12 +1,6 @@
 name: build-and-release-dev-contracts
 
-on:
-  push:
-    branches-ignore:
-      - 'main'
-  workflow_call:
-  workflow_dispatch: # Allow manual trigger
-
+on: workflow_dispatch
 
 jobs:
   release:
