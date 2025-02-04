@@ -3,7 +3,7 @@ name: build-and-release-impl
 on:
   push:
     branches:
-      - '**'
+      - 'main'
   
 
 jobs:
