@@ -5,8 +5,7 @@ on:
   push:
     branches-ignore:
       - 'main'
-  workflow_call:
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:
 
 jobs:
   test:
