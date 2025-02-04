@@ -46,11 +46,11 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-region: us-east-1
-          role-to-assume: arn:aws:iam::${{ vars.PROD_ACCOUNT_NUMBER }}:role/delegatedadmin/developer/github-actions-runner-role
+          role-to-assume: arn:aws:iam::${{ secrets.PROD_ACCOUNT }}:role/delegatedadmin/developer/ab2d-prod-github-actions
 
       - name: Build Docker Image
         env:
-          ACCOUNT_NUMBER: ${{ vars.PROD_ACCOUNT_NUMBER }}
+          ACCOUNT_NUMBER: ${{ secrets.PROD_ACCOUNT}}
           ECR_REPO_ENV: "ab2d-prod-services"
           AWS_REGION: "us-east-1"
         run: ./scripts/github-actions-build-docker-image.sh
