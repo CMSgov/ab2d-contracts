@@ -1,9 +1,7 @@
 name: pull request jobs
 
 on:
-  push:
-    branches-ignore:
-      - 'main'
+  pull_request:
   workflow_dispatch:
   workflow_call:
 
