@@ -43,6 +43,9 @@ jobs:
       - name: Build libraries
         run: |
           gradle -b build.gradle bootJar -Dset.root.project.build.filename=true --info
+  
+      - name: List build directory contents
+        run: ls -l /opt/actions-runner/_work/ab2d-contracts/ab2d-contracts/build/libs/
 
       - name: Assume role in target account
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
