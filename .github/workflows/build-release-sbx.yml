@@ -47,11 +47,11 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-region: us-east-1
-          role-to-assume: arn:aws:iam::${{ vars.SBX_ACCOUNT_NUMBER }}:role/delegatedadmin/developer/github-actions-runner-role
+          role-to-assume: arn:aws:iam::${{ secrets.SBX_ACCOUNT }}:role/delegatedadmin/developer/ab2d-sbx-github-actions
 
       - name: Build Docker Image
         env:
-          ACCOUNT_NUMBER: ${{ vars.SBX_ACCOUNT_NUMBER }}
+          ACCOUNT_NUMBER: ${{ secrets.SBX_ACCOUNT_NUMBER }}
           ECR_REPO_ENV: "ab2d-sbx-services"
           AWS_REGION: "us-east-1"
         run: ./scripts/github-actions-build-docker-image.sh
