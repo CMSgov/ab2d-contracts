@@ -1,7 +1,6 @@
 name: Deploy contracts
 
 on:
-  pull_request:
   workflow_call:
     inputs:
       environment:
