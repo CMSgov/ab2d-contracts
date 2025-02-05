@@ -65,4 +65,5 @@ jobs:
         
       - name: SonarQube Analysis
         run: |
+          git fetch origin
           gradle sonar -Dsonar.qualitygate.wait=true
