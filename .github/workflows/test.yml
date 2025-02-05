@@ -65,4 +65,4 @@ jobs:
         
       - name: SonarQube Analysis
         run: |
-          gradle sonar
+          gradle sonar -Dsonar.qualitygate.wait=true
