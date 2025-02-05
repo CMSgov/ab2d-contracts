@@ -8,15 +8,15 @@ on:
         required: true
         type: string
   workflow_dispatch:
-    inputs:
-      environment:
-        required: true
-        type: choice
-        options:
-          - dev
-          - test
-          - sbx
-          - prod
+    # inputs:
+    #   environment:
+    #     required: true
+    #     type: choice
+    #     options:
+    #       - dev
+    #       - test
+    #       - sbx
+    #       - prod
 
 jobs:
   deploy:
