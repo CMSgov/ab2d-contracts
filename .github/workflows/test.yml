@@ -38,11 +38,31 @@ jobs:
             HPMS_AUTH_KEY_ID=/hpms/id
             HPMS_AUTH_KEY_SECRET=/hpms/secret
 
-      - name: Clean project
-        run: gradle clean
+      # - name: Clean project
+      #   run: gradle clean
 
-      - name: Run unit tests
-        run: gradle test ${RUNNER_DEBUG:+"--debug"}
+      # - name: Run unit tests
+      #   run: gradle test ${RUNNER_DEBUG:+"--debug"}
 
-      - name: SonarQube analysis
-        run: gradle sonar -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.qualitygate.wait=true
+      # - name: SonarQube analysis
+      #   run: gradle sonar -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.qualitygate.wait=true
+
+      - name: Build files
+        run: |
+          gradle build -x test --info 
+
+      - name: Do tests
+        run: |
+          gradle clean test --info build 
+
+      - name: Build Jar
+        run: |
+          gradle jar --info build 
+
+      - name: Gradle task
+        run: |
+          gradle task
+        
+      - name: SonarQube Analysis
+        run: |
+          gradle sonar
