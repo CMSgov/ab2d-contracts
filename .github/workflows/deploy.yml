@@ -1,6 +1,7 @@
-name: Deploy
+name: Deploy contracts
 
 on:
+  push:
   workflow_call:
     inputs:
       environment:
