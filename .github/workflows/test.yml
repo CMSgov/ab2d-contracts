@@ -13,7 +13,8 @@ jobs:
       DEPLOYMENT_ENV: ${{ vars[format('{0}_DEPLOYMENT_ENV', inputs.environment)] }}
 
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - uses: actions/setup-java@8df1039502a15bceb9433410b1a100fbe190c53b # v4.5.0
         with:
