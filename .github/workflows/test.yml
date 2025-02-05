@@ -44,11 +44,4 @@ jobs:
         run: gradle test ${RUNNER_DEBUG:+"--debug"}
 
       - name: SonarQube analysis
-        run: gradle sonar -Dsonar.host.url=$SONAR_HOST_URL
-
-      - name: SonarQube Quality Gate check
-        id: sonarqube-quality-gate-check
-        uses: sonarsource/sonarqube-quality-gate-action@master
-        with:
-          scanMetadataReportFile: build/sonar/report-task.txt
-        timeout-minutes: 5
+        run: gradle sonar -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.qualitygate.wait=true
