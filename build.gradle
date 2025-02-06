@@ -3,7 +3,7 @@ plugins {
     id 'org.springframework.boot' version "2.7.6"
     id 'com.jfrog.artifactory' version '4.33.1' apply false
     id "org.sonarqube" version "4.1.0.3113"
-    id "gov.cms.ab2d.plugin" version "1.0.2"
+//    id "gov.cms.ab2d.plugin" version "1.0.2"
     id 'maven-publish'
     id 'org.cyclonedx.bom' version '1.7.4' apply true
 }
@@ -76,4 +76,13 @@ test {
 repositories {
     mavenCentral()
     mavenLocal()
+    maven {
+        def artifactoryUrl = System.getenv("ARTIFACTORY_URL") ?: System.getProperty("artifactory_contextUrl")
+        println("Using Artifactory URL in build.gradle: ${artifactoryUrl}/ab2d-main")
+        url = "${artifactoryUrl}/ab2d-main"
+        credentials {
+            username = System.getenv("ARTIFACTORY_USER") ?: System.getProperty("username")
+            password = System.getenv("ARTIFACTORY_PASSWORD") ?: System.getProperty("password")
+        }
+    }    
 }
