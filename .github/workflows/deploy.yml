@@ -1,0 +1,37 @@
+name: Deploy contracts
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: choice
+        options:
+          - dev
+          - test
+          - sbx
+          - prod
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ secrets[format('{0}_ACCOUNT', inputs.environment)] }}:role/delegatedadmin/developer/ab2d-${{ inputs.environment }}-github-actions
+      - name: Deploy ECS service to run on latest image in ECR
+        env:
+          DEPLOYMENT_ENV: ${{ vars[format('{0}_DEPLOYMENT_ENV', inputs.environment)] }}
+        run: |
+          echo "Deploying contracts service"
+          aws ecs update-service --cluster "$DEPLOYMENT_ENV-microservice-cluster" --service ab2d-contracts-service --force-new-deployment > /dev/null
+          aws ecs wait services-stable --cluster "$DEPLOYMENT_ENV-microservice-cluster" --services ab2d-contracts-service
