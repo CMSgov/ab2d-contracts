@@ -64,5 +64,5 @@ jobs:
         with:
           args:
             -Dsonar.projectKey=ab2d-contracts
-              -Dsonar.sources=. -Dsonar.sources=src/main/java -Dsonar.java.binaries=target/classes
-              -Dsonar.branch.name=${{ github.event.pull_request.head.ref }} -Dsonar.projectVersion=${{ github.event.pull_request.head.sha }}
+              -Dsonar.sources=. -Dsonar.sources=src/main/java -Dsonar.java.binaries=/usr/src/ab2d-contracts/ab2d-contracts.jar
+              -Dsonar.branch.name=${{ github.event.pull_request.head.ref }} -Dsonar.projectVersion=1.6
