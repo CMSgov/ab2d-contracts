@@ -65,5 +65,5 @@ jobs:
         
       - name: SonarQube Analysis
         run: |
-          git fetch origin master:AB2D-6464-contract-workflows --depth 1
+          git fetch origin main:AB2D-6464-contract-workflows --depth 1
           gradle sonar -Dsonar.qualitygate.wait=true
