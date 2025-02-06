@@ -37,28 +37,37 @@ jobs:
             SONAR_TOKEN=/sonarqube/token
             HPMS_AUTH_KEY_ID=/hpms/id
             HPMS_AUTH_KEY_SECRET=/hpms/secret
-
-  sonar-quality-gate:
-    name: Sonarqube Quality Gate
-    needs: test
-    runs-on: self-hosted
-    steps:
-      - name: Download code coverage
-        uses: actions/download-artifact@v4
+            
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v4
         with:
           name: code-coverage-report
-      - name: Set env vars from AWS params
-        uses: cmsgov/ab2d-bcda-dpc-platform/actions/aws-params-env-action@main
-        env:
-          AWS_REGION: ${{ vars.AWS_REGION }}
-        with:
-          params: |
-            SONAR_HOST_URL=/sonarqube/url
-            SONAR_TOKEN=/sonarqube/token
+          path: ./test_results/latest/testcoverage.out
+
+      - name: Build files
+        run: |
+          gradle build -x test --info 
+
+      - name: Do tests
+        run: |
+          gradle clean test --info build 
+
+      - name: Build Jar
+        run: |
+          gradle jar --info build 
+
+      - name: Gradle task
+        run: |
+          gradle task
+        
+      - name: SonarQube Analysis
+        run: |
+          gradle sonar
+          
       - name: Run quality gate scan
         uses: sonarsource/sonarqube-scan-action@master
         with:
           args:
             -Dsonar.projectKey=ab2d-contracts
-              -Dsonar.sources=. -Dsonar.go.coverage.reportPaths=./test_results/latest/testcoverage.out
+              -Dsonar.sources=. 
               -Dsonar.branch.name=${{ github.event.pull_request.head.ref }} -Dsonar.projectVersion=${{ github.event.pull_request.head.sha }}
