@@ -63,5 +63,5 @@ jobs:
         uses: sonarsource/sonarqube-scan-action@master
         with:
           args:
-            -Dsonar.projectKey=ab2d-contracts
+            -Dsonar.projectKey=ab2d-contracts -Dsonar.filesize.limit=25
              -Dsonar.branch.name=${{ github.event.pull_request.head.ref }}
