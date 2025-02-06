@@ -38,11 +38,6 @@ jobs:
             HPMS_AUTH_KEY_ID=/hpms/id
             HPMS_AUTH_KEY_SECRET=/hpms/secret
             
-      - name: Archive code coverage results
-        uses: actions/upload-artifact@v4
-        with:
-          name: code-coverage-report
-          path: ./test_results/latest/testcoverage.out
 
       - name: Build files
         run: |
