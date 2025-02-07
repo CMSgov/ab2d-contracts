@@ -64,4 +64,6 @@ jobs:
         with:
           args:
             -Dsonar.projectKey=ab2d-contracts -Dsonar.filesize.limit=1024
+            -Dsonar.sources=src/main/java
+            -Dsonar.java.binaries=target/classes
              -Dsonar.branch.name=${{ github.event.pull_request.head.ref }}
