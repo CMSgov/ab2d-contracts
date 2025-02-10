@@ -54,16 +54,34 @@ jobs:
       - name: Gradle task
         run: |
           gradle task
-        
+
       - name: SonarQube Analysis
+        env:
+          ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
+          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          gradle sonar
-          
-      - name: Run quality gate scan
-        uses: sonarsource/sonarqube-scan-action@master
+          gradle sonarqube \
+            -Dsonar.projectKey=ab2d-contracts \
+            -Dsonar.host.url=https://sonarqube.cloud.cms.gov \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            
+      - name: Quality Gate
+        id: quality-gate
+        uses: sonarsource/sonarcloud-github-action@v2
         with:
-          args:
-            -Dsonar.projectKey=ab2d-contracts -Dsonar.filesize.limit=1024
-            -Dsonar.sources=src/main/java
-            -Dsonar.java.binaries=target/classes
-             -Dsonar.branch.name=${{ github.event.pull_request.head.ref }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        timeout-minutes: 10    
+        
+      # - name: SonarQube Analysis
+      #   run: |
+      #     gradle sonar
+          
+      # - name: Run quality gate scan
+      #   uses: sonarsource/sonarqube-scan-action@master
+      #   with:
+      #     args:
+      #       -Dsonar.projectKey=ab2d-contracts -Dsonar.filesize.limit=1024
+      #       -Dsonar.sources=src/main/java
+      #       -Dsonar.java.binaries=target/classes
+      #        -Dsonar.branch.name=${{ github.event.pull_request.head.ref }}
