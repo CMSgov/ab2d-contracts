@@ -61,7 +61,7 @@ jobs:
           ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          gradle sonarqube \
+          gradle sonar \
             -Dsonar.projectKey=ab2d-contracts \
             -Dsonar.host.url=https://sonarqube.cloud.cms.gov \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
@@ -70,7 +70,7 @@ jobs:
         id: quality-gate
         uses: sonarsource/sonarcloud-github-action@v2
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GIT_TOKEN }}
         timeout-minutes: 10    
         
       # - name: SonarQube Analysis
