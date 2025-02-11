@@ -70,16 +70,3 @@ jobs:
         with:
           scanMetadataReportFile: build/sonar/report-task.txt
         timeout-minutes: 10 
-        
-      # - name: SonarQube Analysis
-      #   run: |
-      #     gradle sonar
-          
-      # - name: Run quality gate scan
-      #   uses: sonarsource/sonarqube-scan-action@master
-      #   with:
-      #     args:
-      #       -Dsonar.projectKey=ab2d-contracts -Dsonar.filesize.limit=1024
-      #       -Dsonar.sources=src/main/java
-      #       -Dsonar.java.binaries=target/classes
-      #        -Dsonar.branch.name=${{ github.event.pull_request.head.ref }}
