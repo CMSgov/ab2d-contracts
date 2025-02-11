@@ -63,11 +63,11 @@ jobs:
             -Dsonar.login=$SONAR_TOKEN
             
       - name: Quality Gate
-        id: quality-gate
-        uses: sonarsource/sonarcloud-github-action@v2
+        id: sonarqube-quality-gate-check
+        uses: sonarsource/sonarqube-quality-gate-action@master
         with:
-          github-token: ${{ secrets.GIT_TOKEN }}
-        timeout-minutes: 10    
+          scanMetadataReportFile: build/sonar/report-task.txt
+        timeout-minutes: 10 
         
       # - name: SonarQube Analysis
       #   run: |
