@@ -57,8 +57,7 @@ jobs:
 
       - name: SonarQube Analysis
         run: |
-          gradle sonar
-          # \
+          gradle sonar \
             # -Dsonar.projectKey=ab2d-contracts \
             # -Dsonar.host.url=https://sonarqube.cloud.cms.gov \
             # -Dsonar.login=$SONAR_TOKEN
