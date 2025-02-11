@@ -62,7 +62,6 @@ jobs:
             # -Dsonar.projectKey=ab2d-contracts \
             # -Dsonar.host.url=https://sonarqube.cloud.cms.gov \
             # -Dsonar.login=$SONAR_TOKEN
-            # -Dsonar.branch.name=${{ github.event.pull_request.head.ref }}
             
       - name: Quality Gate
         id: sonarqube-quality-gate-check
