@@ -56,15 +56,11 @@ jobs:
           gradle task
 
       - name: SonarQube Analysis
-        env:
-          ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
-          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           gradle sonar \
             -Dsonar.projectKey=ab2d-contracts \
             -Dsonar.host.url=https://sonarqube.cloud.cms.gov \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.login=$SONAR_TOKEN
             
       - name: Quality Gate
         id: quality-gate
