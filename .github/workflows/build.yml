@@ -40,10 +40,6 @@ jobs:
             ARTIFACTORY_USER=/artifactory/user
             ARTIFACTORY_PASSWORD=/artifactory/password
 
-      - name: Build libraries
-        run: |
-          gradle -b build.gradle bootJar -Dset.root.project.build.filename=true
-
       - name: Assume role in target account
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
         with:
