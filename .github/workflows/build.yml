@@ -46,9 +46,6 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: arn:aws:iam::${{ secrets[format('{0}_ACCOUNT', inputs.environment)] }}:role/delegatedadmin/developer/ab2d-${{ inputs.environment }}-github-actions
 
-      - name: List build directory contents
-        run: ls -l /opt/actions-runner/_work/ab2d-properties/ab2d-properties/build/libs/
-
       - name: Build and push docker image
         env:
           ACCOUNT: ${{ secrets[format('{0}_ACCOUNT', inputs.environment)] }}
