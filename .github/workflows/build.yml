@@ -46,10 +46,9 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: arn:aws:iam::${{ secrets[format('{0}_ACCOUNT', inputs.environment)] }}:role/delegatedadmin/developer/ab2d-${{ inputs.environment }}-github-actions
 
-      - name: Check build context
+      - name: Build libraries
         run: |
-          ls -l /opt/actions-runner/_work/ab2d-contracts/ab2d-contracts/
-          ls -l /opt/actions-runner/_work/ab2d-contracts/ab2d-contracts/build/libs/
+          gradle -b build.gradle bootJar -Dset.root.project.build.filename=true
 
       - name: Build and push docker image
         env:
@@ -69,7 +68,7 @@ jobs:
 
           TAG="$ECR_URI:contracts-service"
 
-          docker build -t $TAG /opt/actions-runner/_work/ab2d-contracts/ab2d-contracts/
+          docker build -t $TAG .
 
           # Push to special tag for promotion if this is run on a push to main
           if [ "$GITHUB_REF" == "refs/heads/main" ]; then
