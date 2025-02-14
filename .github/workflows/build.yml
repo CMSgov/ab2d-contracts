@@ -46,7 +46,7 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: arn:aws:iam::${{ secrets[format('{0}_ACCOUNT', inputs.environment)] }}:role/delegatedadmin/developer/ab2d-${{ inputs.environment }}-github-actions
 
-      - name: Debug: Check build context
+      - name: Check build context
         run: |
           ls -l /opt/actions-runner/_work/ab2d-contracts/ab2d-contracts/
           ls -l /opt/actions-runner/_work/ab2d-contracts/ab2d-contracts/build/libs/
