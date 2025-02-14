@@ -64,7 +64,7 @@ jobs:
 
           TAG="$ECR_URI:contracts-service"
 
-          docker build -t $TAG .
+          docker build -t $TAG /opt/actions-runner/_work/ab2d-contracts/ab2d-contracts/
 
           # Push to special tag for promotion if this is run on a push to main
           if [ "$GITHUB_REF" == "refs/heads/main" ]; then
