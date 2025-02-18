@@ -1,0 +1,72 @@
+name: Unit tests and static analysis
+
+on:
+  workflow_call:
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  test:
+    runs-on: self-hosted
+    env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      DEPLOYMENT_ENV: ${{ vars[format('{0}_DEPLOYMENT_ENV', inputs.environment)] }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  
+
+      - uses: actions/setup-java@8df1039502a15bceb9433410b1a100fbe190c53b # v4.5.0
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@0bdd871935719febd78681f197cd39af5b6e16a6 # v4.2.2
+        with:
+          gradle-version: 7.5
+
+      - uses: cmsgov/ab2d-bcda-dpc-platform/actions/aws-params-env-action@main
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+        with:
+          params: |
+            ARTIFACTORY_URL=/artifactory/url
+            ARTIFACTORY_USER=/artifactory/user
+            ARTIFACTORY_PASSWORD=/artifactory/password
+            SONAR_HOST_URL=/sonarqube/url
+            SONAR_TOKEN=/sonarqube/token
+            HPMS_AUTH_KEY_ID=/hpms/id
+            HPMS_AUTH_KEY_SECRET=/hpms/secret
+            
+
+      - name: Build files
+        run: |
+          gradle build -x test --info 
+
+      - name: Do tests
+        run: |
+          gradle clean test --info build 
+
+      - name: Build Jar
+        run: |
+          gradle jar --info build 
+
+      - name: Gradle task
+        run: |
+          gradle task
+
+      - name: SonarQube Analysis
+        run: |
+          gradle sonar \
+            -Dsonar.projectKey=ab2d-contracts \
+            -Dsonar.host.url=https://sonarqube.cloud.cms.gov \
+            -Dsonar.login=$SONAR_TOKEN
+            
+      - name: Quality Gate
+        id: sonarqube-quality-gate-check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        with:
+          scanMetadataReportFile: build/sonar/report-task.txt
+        timeout-minutes: 10 
