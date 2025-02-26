@@ -29,12 +29,7 @@ allprojects {
         implementation "io.awspring.cloud:spring-cloud-aws-starter:${springCloudAwsVersion}"
         implementation "io.awspring.cloud:spring-cloud-aws-starter-sqs:${springCloudAwsVersion}"
         implementation 'net.logstash.logback:logstash-logback-encoder:7.3'
-        implementation 'org.springframework.boot:spring-boot-starter-webflux:2.7.6'
-        testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.6'
-        testImplementation 'org.mockito:mockito-inline:5.2.0'
-        implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.6'
-        implementation 'org.springframework.boot:spring-boot-starter-validation:2.7.6'
-        implementation 'org.springframework.boot:spring-boot-starter-web:2.7.6'
+        implementation 'org.liquibase:liquibase-core:4.23.0'
         implementation 'org.postgresql:postgresql:42.7.3'
         implementation "org.springframework.boot:spring-boot-starter-quartz:${springBootVersion}"
         implementation "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}"
