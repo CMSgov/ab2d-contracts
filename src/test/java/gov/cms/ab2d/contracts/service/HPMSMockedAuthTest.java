@@ -1,6 +1,6 @@
 package gov.cms.ab2d.contracts.service;
 
-import gov.cms.ab2d.contracts.SpringBootApp;
+import gov.cms.ab2d.contracts.controller.RemoteTimeoutException;
 import gov.cms.ab2d.contracts.util.AB2DPostgresqlContainer;
 import gov.cms.ab2d.eventclient.clients.SQSEventClient;
 import gov.cms.ab2d.contracts.hmsapi.HPMSAuthResponse;
@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.remoting.RemoteTimeoutException;
+
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;

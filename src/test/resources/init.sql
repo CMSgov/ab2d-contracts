@@ -21,3 +21,4 @@ ALTER TABLE ONLY contract.contract
     ADD CONSTRAINT contract_pkey PRIMARY KEY (id);
 
 CREATE SEQUENCE hibernate_sequence START 1;
+CREATE SEQUENCE IF NOT EXISTS contract_seq START 1;
