@@ -30,8 +30,8 @@ jobs:
           role-to-assume: arn:aws:iam::${{ secrets[format('{0}_ACCOUNT', inputs.environment)] }}:role/delegatedadmin/developer/ab2d-${{ inputs.environment }}-github-actions
       - name: Deploy ECS service to run on latest image in ECR
         env:
-          DEPLOYMENT_ENV: ${{ vars[format('{0}_DEPLOYMENT_ENV', inputs.environment)] }}
+          DEPLOYMENT_ENV: ab2d-${{ vars[format('{0}_DEPLOYMENT_ENV', inputs.environment)] }}-microservice-cluster
         run: |
           echo "Deploying contracts service"
-          aws ecs update-service --cluster "$DEPLOYMENT_ENV-microservice-cluster" --service ab2d-contracts-service --force-new-deployment > /dev/null
-          aws ecs wait services-stable --cluster "$DEPLOYMENT_ENV-microservice-cluster" --services ab2d-contracts-service
+          aws ecs update-service --cluster "$DEPLOYMENT_ENV" --service ab2d-contracts-service --force-new-deployment > /dev/null
+          aws ecs wait services-stable --cluster "$DEPLOYMENT_ENV" --services ab2d-contracts-service
