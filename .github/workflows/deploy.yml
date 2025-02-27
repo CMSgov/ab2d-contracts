@@ -15,6 +15,7 @@ on:
           - dev
           - test
           - sbx
+          - prod_test
           - prod
 
 jobs:
