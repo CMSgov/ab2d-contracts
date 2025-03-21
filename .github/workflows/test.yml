@@ -1,7 +1,6 @@
 name: Unit tests and static analysis
 
 on:
-  push:
   workflow_call:
   workflow_dispatch: # Allow manual trigger
 
