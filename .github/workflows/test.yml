@@ -39,19 +39,15 @@ jobs:
             SONAR_TOKEN=/sonarqube/token
 
       - uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
-        env:
-          ACCOUNT_NAME: ${{ inputs.environment == 'prod_test' && 'prod' || inputs.environment }}
         with:
           aws-region: ${{ vars.AWS_REGION }}
-          role-to-assume: arn:aws:iam::${{ secrets[format('{0}_ACCOUNT', env.ACCOUNT_NAME)] }}:role/delegatedadmin/developer/ab2d-${{ env.ACCOUNT_NAME }}-github-actions
+          role-to-assume: arn:aws:iam::${{ secrets.TEST_ACCOUNT }}:role/delegatedadmin/developer/ab2d-test-github-actions
 
       - uses: aws-actions/aws-secretsmanager-get-secrets@fbd65ea98e018858715f591f03b251f02b2316cb #v2.0.8
-        env:
-          SECRET_ENV: ${{ env.DEPLOYMENT_ENV == 'east-prod-test' && 'east-prod' || env.DEPLOYMENT_ENV }}
         with:
           secret-ids: |
-            HPMS_AUTH_KEY_ID, ab2d/ab2d-${{ env.SECRET_ENV }}/module/db/ab2d_hpms_auth_key_id/2020-01-02-09-15-01
-            HPMS_AUTH_KEY_SECRET, ab2d/ab2d-${{ env.SECRET_ENV }}/module/db/ab2d_hpms_auth_key_secret/2020-01-02-09-15-01
+            HPMS_AUTH_KEY_ID, ab2d/ab2d-east-impl/module/db/ab2d_hpms_auth_key_id/2020-01-02-09-15-01
+            HPMS_AUTH_KEY_SECRET, ab2d/ab2d-east-impl/module/db/ab2d_hpms_auth_key_secret/2020-01-02-09-15-01
 
       - name: Build files
         run: |
