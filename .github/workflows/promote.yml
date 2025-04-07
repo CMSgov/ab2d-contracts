@@ -14,9 +14,6 @@ on:
         options:
           - prod_test
           - prod
-  pull_request:
-    branches:
-      - main
 
 permissions:
   contents: read
@@ -26,14 +23,11 @@ jobs:
   promote:
     runs-on: self-hosted
     steps:
-      - name: Determine promotion environment
+      - name: Set environment
         id: set-env
         run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            echo "env_name=prod_test" >> $GITHUB_OUTPUT
-          else
-            echo "env_name=${{ inputs.environment }}" >> $GITHUB_OUTPUT
-          fi
+          echo "env_name=${{ inputs.environment }}" >> $GITHUB_OUTPUT
+
       - name: Define source/destination config
         id: repos
         run: |
@@ -47,6 +41,7 @@ jobs:
             echo "DEST_REPO=ab2d-prod-services" >> $GITHUB_OUTPUT
           fi
           echo "TAG_NAME=contracts-service" >> $GITHUB_ENV
+
       - name: Authenticate to source account (pull)
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
@@ -67,6 +62,7 @@ jobs:
           docker pull "$SRC_ECR/$SOURCE_REPO:$TAG_NAME"
           echo "SRC_ECR=$SRC_ECR" >> $GITHUB_OUTPUT
           echo "IMAGE=$SRC_ECR/$SOURCE_REPO:$TAG_NAME" >> $GITHUB_OUTPUT
+
       - name: Authenticate to destination account (push)
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
