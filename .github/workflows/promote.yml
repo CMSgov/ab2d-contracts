@@ -12,6 +12,7 @@ on:
         required: true
         type: choice
         options:
+          - sbx
           - prod_test
           - prod
 
@@ -25,21 +26,28 @@ jobs:
     steps:
       - name: Set environment
         id: set-env
-        run: |
-          echo "env_name=${{ inputs.environment }}" >> $GITHUB_OUTPUT
+        run: echo "env_name=${{ inputs.environment }}" >> $GITHUB_OUTPUT
 
       - name: Define source/destination config
         id: repos
         run: |
-          if [ "${{ steps.set-env.outputs.env_name }}" == "prod_test" ]; then
-            echo "SOURCE_ENV=test" >> $GITHUB_OUTPUT
-            echo "SOURCE_REPO=ab2d-impl-services" >> $GITHUB_OUTPUT
-            echo "DEST_REPO=ab2d-prod-test-services" >> $GITHUB_OUTPUT
-          elif [ "${{ steps.set-env.outputs.env_name }}" == "prod" ]; then
-            echo "SOURCE_ENV=prod_test" >> $GITHUB_OUTPUT
-            echo "SOURCE_REPO=ab2d-prod-test-services" >> $GITHUB_OUTPUT
-            echo "DEST_REPO=ab2d-prod-services" >> $GITHUB_OUTPUT
-          fi
+          case "${{ inputs.environment }}" in
+            test)
+              echo "SOURCE_ENV=test" >> $GITHUB_OUTPUT
+              echo "SOURCE_REPO=ab2d-impl-services" >> $GITHUB_OUTPUT
+              echo "DEST_REPO=ab2d-sbx-services" >> $GITHUB_OUTPUT
+              ;;
+            prod_test)
+              echo "SOURCE_ENV=test" >> $GITHUB_OUTPUT
+              echo "SOURCE_REPO=ab2d-impl-services" >> $GITHUB_OUTPUT
+              echo "DEST_REPO=ab2d-prod-test-services" >> $GITHUB_OUTPUT
+              ;;
+            prod)
+              echo "SOURCE_ENV=test" >> $GITHUB_OUTPUT
+              echo "SOURCE_REPO=ab2d-impl-services" >> $GITHUB_OUTPUT
+              echo "DEST_REPO=ab2d-prod-services" >> $GITHUB_OUTPUT
+              ;;
+          esac
           echo "TAG_NAME=contracts-service" >> $GITHUB_ENV
 
       - name: Authenticate to source account (pull)
@@ -60,15 +68,14 @@ jobs:
           docker login --username AWS --password-stdin $SRC_ECR <<< $(aws ecr get-login-password)
           echo "Pulling $SRC_ECR/$SOURCE_REPO:$TAG_NAME"
           docker pull "$SRC_ECR/$SOURCE_REPO:$TAG_NAME"
-          echo "SRC_ECR=$SRC_ECR" >> $GITHUB_OUTPUT
           echo "IMAGE=$SRC_ECR/$SOURCE_REPO:$TAG_NAME" >> $GITHUB_OUTPUT
 
       - name: Authenticate to destination account (push)
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
           aws-region: ${{ vars.AWS_REGION }}
-          role-to-assume: arn:aws:iam::${{ secrets.prod_ACCOUNT }}:role/delegatedadmin/developer/ab2d-prod-github-actions
-
+          role-to-assume: arn:aws:iam::${{ secrets[format('{0}_ACCOUNT', steps.set-env.outputs.env_name)] }}:role/delegatedadmin/developer/ab2d-${{ steps.set-env.outputs.env_name }}-github-actions
+      
       - name: Tag and push image to destination ECR
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
