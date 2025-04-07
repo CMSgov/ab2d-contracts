@@ -23,45 +23,34 @@ permissions:
 jobs:
   promote:
     runs-on: self-hosted
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      TAG_NAME: contracts-service
+      SOURCE_REPO: ab2d-impl-services
     steps:
-      - name: Set environment
-        id: set-env
-        run: echo "env_name=${{ inputs.environment }}" >> $GITHUB_OUTPUT
-
-      - name: Define source/destination config
+      - name: Define destination repo
         id: repos
         run: |
           case "${{ inputs.environment }}" in
-            test)
-              echo "SOURCE_ENV=test" >> $GITHUB_OUTPUT
-              echo "SOURCE_REPO=ab2d-impl-services" >> $GITHUB_OUTPUT
+            sbx)
               echo "DEST_REPO=ab2d-sbx-services" >> $GITHUB_OUTPUT
               ;;
             prod_test)
-              echo "SOURCE_ENV=test" >> $GITHUB_OUTPUT
-              echo "SOURCE_REPO=ab2d-impl-services" >> $GITHUB_OUTPUT
               echo "DEST_REPO=ab2d-prod-test-services" >> $GITHUB_OUTPUT
               ;;
             prod)
-              echo "SOURCE_ENV=test" >> $GITHUB_OUTPUT
-              echo "SOURCE_REPO=ab2d-impl-services" >> $GITHUB_OUTPUT
               echo "DEST_REPO=ab2d-prod-services" >> $GITHUB_OUTPUT
               ;;
           esac
-          echo "TAG_NAME=contracts-service" >> $GITHUB_ENV
 
-      - name: Authenticate to source account (pull)
+      - name: Authenticate to source account (pull from test)
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
-          aws-region: ${{ vars.AWS_REGION }}
-          role-to-assume: arn:aws:iam::${{ secrets[format('{0}_ACCOUNT', steps.repos.outputs.SOURCE_ENV)] }}:role/delegatedadmin/developer/ab2d-${{ steps.repos.outputs.SOURCE_ENV }}-github-actions
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ secrets.test_ACCOUNT }}:role/delegatedadmin/developer/ab2d-test-github-actions
 
-      - name: Pull image from source ECR
+      - name: Pull image from test ECR
         id: pull-image
-        env:
-          AWS_REGION: ${{ vars.AWS_REGION }}
-          SOURCE_REPO: ${{ steps.repos.outputs.SOURCE_REPO }}
-          TAG_NAME: contracts-service
         run: |
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
           SRC_ECR="$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
@@ -73,14 +62,13 @@ jobs:
       - name: Authenticate to destination account (push)
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
-          aws-region: ${{ vars.AWS_REGION }}
-          role-to-assume: arn:aws:iam::${{ secrets[format('{0}_ACCOUNT', steps.set-env.outputs.env_name)] }}:role/delegatedadmin/developer/ab2d-${{ steps.set-env.outputs.env_name }}-github-actions
-      
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: |
+            arn:aws:iam::${{ secrets[inputs.environment == 'prod_test' && 'prod_ACCOUNT' || format('{0}_ACCOUNT', inputs.environment)] }}:role/delegatedadmin/developer/ab2d-${{ inputs.environment == 'prod_test' && 'prod' || inputs.environment }}-github-actions
+
       - name: Tag and push image to destination ECR
         env:
-          AWS_REGION: ${{ vars.AWS_REGION }}
           DEST_REPO: ${{ steps.repos.outputs.DEST_REPO }}
-          TAG_NAME: contracts-service
           IMAGE: ${{ steps.pull-image.outputs.IMAGE }}
         run: |
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
