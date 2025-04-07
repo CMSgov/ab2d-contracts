@@ -47,7 +47,7 @@ jobs:
             echo "SOURCE_REPO=ab2d-prod-test-services" >> $GITHUB_OUTPUT
             echo "DEST_REPO=ab2d-prod-services" >> $GITHUB_OUTPUT
           fi
-          echo "TAG_NAME=event-service" >> $GITHUB_ENV
+          echo "TAG_NAME=contracts-service" >> $GITHUB_ENV
 
       - name: Authenticate to source account (pull)
         uses: aws-actions/configure-aws-credentials@v4.0.2
@@ -60,7 +60,7 @@ jobs:
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
           SOURCE_REPO: ${{ steps.repos.outputs.SOURCE_REPO }}
-          TAG_NAME: event-service
+          TAG_NAME: contracts-service
         run: |
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
           SRC_ECR="$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
@@ -82,7 +82,7 @@ jobs:
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
           DEST_REPO: ${{ steps.repos.outputs.DEST_REPO }}
-          TAG_NAME: event-service
+          TAG_NAME: contracts-service
           IMAGE: ${{ steps.pull-image.outputs.IMAGE }}
         run: |
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
