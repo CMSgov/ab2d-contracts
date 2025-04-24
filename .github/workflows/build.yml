@@ -48,11 +48,11 @@ jobs:
 
       - name: Test
         run: |
-          ./gradlew clean test --info -b build.gradle
+          gradle clean test --info -b build.gradle
 
       - name: Build libraries
         run: |
-          ./gradle -b build.gradle bootJar -Dset.root.project.build.filename=true
+          gradle -b build.gradle bootJar -Dset.root.project.build.filename=true
 
       - name: Build and push docker image
         env:
