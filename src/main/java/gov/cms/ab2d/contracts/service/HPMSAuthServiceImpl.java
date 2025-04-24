@@ -78,10 +78,6 @@ public class HPMSAuthServiceImpl extends AbstractHPMSService implements HPMSAuth
     private void checkTokenExpiration() {
         if (authContext.getAuthToken().isBlank() || System.currentTimeMillis() >= authContext.getTokenRefreshAfter()) {
             refreshToken();
-            log.info("Refreshed token; Token expires at {}; Next refresh will be after {}",
-                timestampToUTC(authContext.getTokenExpires()),
-                timestampToUTC(authContext.getTokenRefreshAfter())
-            );
         }
     }
 
@@ -120,6 +116,10 @@ public class HPMSAuthServiceImpl extends AbstractHPMSService implements HPMSAuth
             // a significant operation when the token expires.
             newAuthContext.tokenRefreshAfter(curTime + authResponse.getExpires() * 800L);
             this.authContext = newAuthContext.build();
+            log.info("Refreshed token; Token expires at {}; Next refresh will be after {}",
+                timestampToUTC(authContext.getTokenExpires()),
+                timestampToUTC(authContext.getTokenRefreshAfter())
+            );
         } catch (WebClientResponseException exception) {
             eventLogger.log(EventClient.LogType.SQL,
                     new ErrorEvent(HPMS_ORGANIZATION, "", HPMS_AUTH_ERROR, prepareErrorMessage(exception, curTime)));
