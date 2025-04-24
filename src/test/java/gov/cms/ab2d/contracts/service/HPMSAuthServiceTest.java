@@ -39,7 +39,7 @@ class HPMSAuthServiceTest {
         assertNotNull(authService);
 
         // Verifying initial state
-        assertNull(authService.getAuthToken());
+        assertTrue(authService.getAuthToken().isBlank());
         assertEquals(0L, authService.getTokenRefreshAfter());
 
         // Verifying the first time

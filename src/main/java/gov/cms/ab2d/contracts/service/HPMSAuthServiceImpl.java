@@ -155,11 +155,11 @@ public class HPMSAuthServiceImpl extends AbstractHPMSService implements HPMSAuth
 
 
     String getAuthToken() {
-        return authContext == null ? null : authContext.getAuthToken();
+        return authContext.getAuthToken();
     }
 
     long getTokenRefreshAfter() {
-        return authContext == null ? 0L : authContext.getTokenRefreshAfter();
+        return authContext.getTokenRefreshAfter();
     }
 
     void clearToken() {
