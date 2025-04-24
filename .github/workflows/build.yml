@@ -46,9 +46,13 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: arn:aws:iam::${{ secrets[format('{0}_ACCOUNT', inputs.environment)] }}:role/delegatedadmin/developer/ab2d-${{ inputs.environment }}-github-actions
 
+      - name: Test
+        run: |
+          ./gradlew clean test --info -b build.gradle
+
       - name: Build libraries
         run: |
-          gradle -b build.gradle bootJar -Dset.root.project.build.filename=true
+          ./gradle -b build.gradle bootJar -Dset.root.project.build.filename=true
 
       - name: Build and push docker image
         env:
