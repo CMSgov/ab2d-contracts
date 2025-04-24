@@ -194,8 +194,10 @@ public class HPMSAuthServiceImpl extends AbstractHPMSService implements HPMSAuth
     private static class HPMSAuthContext {
         private final String authToken;
         private final String cookies;
-        private final long tokenRefreshAfter;
+        /** time when token expires */
         private final long tokenExpires;
+        /** time when we should refresh another token */
+        private final long tokenRefreshAfter;
 
         public static HPMSAuthContext emptyContext() {
             return new HPMSAuthContext("", "", 0L, 0L);
