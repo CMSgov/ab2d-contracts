@@ -1,6 +1,5 @@
 package gov.cms.ab2d.contracts.service;
 
-import gov.cms.ab2d.contracts.SpringBootApp;
 import gov.cms.ab2d.contracts.util.AB2DPostgresqlContainer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -40,15 +39,15 @@ class HPMSAuthServiceTest {
         assertNotNull(authService);
 
         // Verifying initial state
-        assertNull(authService.getAuthToken());
-        assertEquals(0L, authService.getTokenExpires());
+        assertTrue(authService.getAuthToken().isBlank());
+        assertEquals(0L, authService.getTokenRefreshAfter());
 
         // Verifying the first time
         HttpHeaders headers = new HttpHeaders();
         authService.buildAuthHeaders(headers);
         //noinspection ConstantConditions
         assertEquals(authService.getAuthToken(), headers.get(HttpHeaders.AUTHORIZATION).get(0));
-        assertNotEquals(0, authService.getTokenExpires());
+        assertNotEquals(0, authService.getTokenRefreshAfter());
 
         String firstAuthToken = authService.getAuthToken();
         // Second call should return identical token (since it is cached)
@@ -56,15 +55,15 @@ class HPMSAuthServiceTest {
         authService.buildAuthHeaders(headers);
         //noinspection ConstantConditions
         assertEquals(firstAuthToken, headers.get(HttpHeaders.AUTHORIZATION).get(0));
-        long tokenExpiry = authService.getTokenExpires();
+        long tokenExpiry = authService.getTokenRefreshAfter();
 
         // Force an expiry and see a new token is retrieved, can't depend upon the actual token being physically
         // refreshed (without inserting a 500 ms pause), so just check expiry hear (which with 1 clock tick, will be
         // different.
-        authService.clearTokenExpires();
+        authService.clearToken();
         headers = new HttpHeaders();
         authService.buildAuthHeaders(headers);
-        assertNotEquals(tokenExpiry, authService.getTokenExpires());
+        assertNotEquals(tokenExpiry, authService.getTokenRefreshAfter());
     }
 
     @Test

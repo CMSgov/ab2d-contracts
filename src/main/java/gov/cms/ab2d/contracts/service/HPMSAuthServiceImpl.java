@@ -7,10 +7,17 @@ import gov.cms.ab2d.eventclient.events.ErrorEvent;
 import gov.cms.ab2d.contracts.hmsapi.HPMSAuthResponse;
 import java.net.URI;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import jakarta.annotation.PostConstruct;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +36,7 @@ import static org.springframework.http.HttpHeaders.COOKIE;
 import static org.springframework.http.HttpStatus.OK;
 
 @Service
+@Slf4j
 public class HPMSAuthServiceImpl extends AbstractHPMSService implements HPMSAuthService {
 
     private static final String HPMS_ORGANIZATION = "HPMS_AUTH";
@@ -50,10 +58,7 @@ public class HPMSAuthServiceImpl extends AbstractHPMSService implements HPMSAuth
 
     private URI fullAuthURI;
 
-    private volatile String authToken;
-    private volatile String cookies;
-
-    private volatile long tokenExpires;
+    private HPMSAuthContext authContext = HPMSAuthContext.emptyContext();
 
     @PostConstruct
     private void buildFullAuthURI() {
@@ -63,23 +68,28 @@ public class HPMSAuthServiceImpl extends AbstractHPMSService implements HPMSAuth
     @Override
     public void buildAuthHeaders(HttpHeaders headers) {
         headers.set("X-API-CONSUMER-ID", hpmsAPIKeyId);
-        headers.set(AUTHORIZATION, retrieveAuthToken());
+        checkTokenExpiration();
+
+        headers.set(AUTHORIZATION, authContext.getAuthToken());
         // re-injecting cookies using WebClient's cookie handler is even more cumbersome
-        headers.set(COOKIE, cookies);
+        headers.set(COOKIE, authContext.getCookies());
     }
 
-    private String retrieveAuthToken() {
-        final long currentTimestamp = System.currentTimeMillis();
-        if (authToken == null || currentTimestamp >= tokenExpires) {
-
-            refreshToken(currentTimestamp);
+    private void checkTokenExpiration() {
+        if (authContext.getAuthToken().isBlank() || System.currentTimeMillis() >= authContext.getTokenRefreshAfter()) {
+            refreshToken();
         }
-
-        return authToken;
     }
 
-    private void refreshToken(long currentTimestamp) {
-        authToken = null;
+    private String timestampToUTC(long timestamp) {
+        return Instant.ofEpochMilli(timestamp)
+                .atZone(ZoneOffset.UTC)
+                .toString();
+    }
+
+    private synchronized void refreshToken() {
+        this.authContext = HPMSAuthContext.emptyContext();
+        val newAuthContext = HPMSAuthContext.builder();
 
         Mono<HPMSAuthResponse> orgInfoMono = webClient
                 .post().uri(fullAuthURI)
@@ -87,7 +97,7 @@ public class HPMSAuthServiceImpl extends AbstractHPMSService implements HPMSAuth
                 .bodyValue(retrieveAuthRequestPayload())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchangeToMono(response -> {
-                    cookies = extractCookies(response.cookies());
+                    newAuthContext.cookies(extractCookies(response.cookies()));
                     return response.statusCode().equals(OK)
                             ? response.bodyToMono(HPMSAuthResponse.class)
                             : response.createException().flatMap(Mono::error);
@@ -100,10 +110,16 @@ public class HPMSAuthServiceImpl extends AbstractHPMSService implements HPMSAuth
             authResponse = Optional.ofNullable(orgInfoMono.block(Duration.ofMinutes(1)))
                     .orElseThrow(IllegalStateException::new);
 
-            // Convert seconds to millis at a 90% level to pad refreshing of a token so that we are not in the middle of
+            newAuthContext.authToken(authResponse.getAccessToken());
+            newAuthContext.tokenExpires(curTime + authResponse.getExpires() * 1000L);
+            // Convert seconds to millis at a 80% level to pad refreshing of a token so that we are not in the middle of
             // a significant operation when the token expires.
-            tokenExpires = currentTimestamp + authResponse.getExpires() * 900L;
-            authToken = authResponse.getAccessToken();
+            newAuthContext.tokenRefreshAfter(curTime + authResponse.getExpires() * 800L);
+            this.authContext = newAuthContext.build();
+            log.info("Refreshed token; Token expires at {}; Next refresh will be after {}",
+                timestampToUTC(authContext.getTokenExpires()),
+                timestampToUTC(authContext.getTokenRefreshAfter())
+            );
         } catch (WebClientResponseException exception) {
             eventLogger.log(EventClient.LogType.SQL,
                     new ErrorEvent(HPMS_ORGANIZATION, "", HPMS_AUTH_ERROR, prepareErrorMessage(exception, curTime)));
@@ -139,20 +155,19 @@ public class HPMSAuthServiceImpl extends AbstractHPMSService implements HPMSAuth
 
 
     String getAuthToken() {
-        return authToken;
+        return authContext.getAuthToken();
     }
 
-    long getTokenExpires() {
-        return tokenExpires;
+    long getTokenRefreshAfter() {
+        return authContext.getTokenRefreshAfter();
     }
 
-    void clearTokenExpires() {
-        this.tokenExpires = 0;
+    void clearToken() {
+        this.authContext = HPMSAuthContext.emptyContext();
     }
 
     void cleanup() {
-        clearTokenExpires();
-        authToken = null;
+        clearToken();
     }
 
     private String prepareErrorMessage(WebClientResponseException exception, long curTime) {
@@ -171,5 +186,21 @@ public class HPMSAuthServiceImpl extends AbstractHPMSService implements HPMSAuth
         }
 
         return explication;
+    }
+
+    @AllArgsConstructor
+    @Getter
+    @Builder
+    private static class HPMSAuthContext {
+        private final String authToken;
+        private final String cookies;
+        /** time when token expires */
+        private final long tokenExpires;
+        /** time when we should request another token */
+        private final long tokenRefreshAfter;
+
+        public static HPMSAuthContext emptyContext() {
+            return new HPMSAuthContext("", "", 0L, 0L);
+        }
     }
 }
