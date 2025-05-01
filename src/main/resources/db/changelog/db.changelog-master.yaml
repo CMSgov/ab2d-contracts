@@ -4,4 +4,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/v2023/contract-service-coverage-info.sql
   - include:
-      file: db/changelog/v2025/add_sequence.sql
+      file: db/changelog/v2025/add_contract_sequence.sql
+  - include:
+      file: db/changelog/v2025/alter_contract_sequence.sql
