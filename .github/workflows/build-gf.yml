@@ -57,7 +57,7 @@ jobs:
 
       - name: Build and push docker image
         run: |
-          ECR_DOMAIN="$AWS_CCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com"
+          ECR_DOMAIN="$AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com"
 
           aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_DOMAIN
 
