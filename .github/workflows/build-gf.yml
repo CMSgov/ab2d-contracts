@@ -1,0 +1,78 @@
+name: Build-gf
+run-name: build-gf ${{ inputs.environment }}
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: AB2D environment
+        required: true
+        type: choice
+        options:
+          - dev
+          - test
+
+jobs:
+  build:
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: codebuild-ab2d-${{github.run_id}}-${{github.run_attempt}}
+    env:
+      AWS_ACCOUNT: ${{ secrets.NON_PROD_ACCOUNT }}
+      AB2D_ENV: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - uses: actions/setup-java@8df1039502a15bceb9433410b1a100fbe190c53b # v4.5.0
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@0bdd871935719febd78681f197cd39af5b6e16a6 # v4.2.2
+        with:
+          gradle-version: 8.4
+
+      - uses: cmsgov/ab2d-bcda-dpc-platform/actions/aws-params-env-action@main
+        with:
+          params: |
+            ARTIFACTORY_URL=/artifactory/url
+            ARTIFACTORY_USER=/artifactory/user
+            ARTIFACTORY_PASSWORD=/artifactory/password
+
+      - name: Assume role in target account
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/delegatedadmin/developer/ab2d-${{ env.AB2D_ENV }}-github-actions
+
+      - name: Build libraries
+        run: |
+          gradle -b build.gradle bootJar -Dset.root.project.build.filename=true
+
+      - name: Build and push docker image
+        run: |
+          ECR_DOMAIN="$ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com"
+
+          aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_DOMAIN
+
+          ECR_REPO="ab2d-$AB2D_ENV-services"
+          ECR_URI="$ECR_DOMAIN/$ECR_REPO"
+
+          TAG="$ECR_URI:contracts-service"
+
+          docker build -t $TAG .
+
+          # Push to special tag for promotion if this is run on a push to main
+          if [ "$GITHUB_REF" == "refs/heads/main" ]; then
+            SHA_SHORT=$(git rev-parse --short HEAD)
+            echo "Tagging image for commit sha $SHA_SHORT"
+            docker tag "$TAG" "$ECR_URI:contracts-service-main-$SHA_SHORT"
+          fi
+
+          docker push "$ECR_URI" --all-tags
