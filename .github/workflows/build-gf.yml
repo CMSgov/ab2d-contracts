@@ -22,9 +22,9 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    runs-on: codebuild-ab2d-${{github.run_id}}-${{github.run_attempt}}
+    runs-on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
     env:
-      AWS_ACCOUNT: ${{ secrets.NON_PROD_ACCOUNT }}
+      AWS_ACCOUNT: ${{ secrets.GF_NON_PROD_ACCOUNT }}
       AB2D_ENV: ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
