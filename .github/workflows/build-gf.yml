@@ -61,7 +61,7 @@ jobs:
 
           aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_DOMAIN
 
-          ECR_REPO="ab2d-$AB2D_ENV-services"
+          ECR_REPO="ab2d-services"
           ECR_URI="$ECR_DOMAIN/$ECR_REPO"
 
           TAG="$ECR_URI:contracts-service"
