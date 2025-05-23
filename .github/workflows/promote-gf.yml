@@ -7,12 +7,12 @@ on:
 #      environment:
 #        required: true
 #        type: string
-      sha_short:
+      tag_suffix:
         required: true
         type: string
   workflow_dispatch:
     inputs:
-      sha_short:
+      tag_suffix:
         description: SHA
         required: true
         type: string
@@ -37,7 +37,7 @@ jobs:
     runs-on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
     env:
 #      AB2D_ENV: ${{ inputs.environment }}
-      TAG_NAME: contracts-service-${{ inputs.sha_short }}
+      TAG_NAME: contracts-service-${{ inputs.tag_suffix }}
       SOURCE_REPO: ab2d-services # not ab2d-impl-services
     steps:
       - name: Define destination repo
