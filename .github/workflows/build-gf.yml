@@ -75,4 +75,4 @@ jobs:
           docker push "$ECR_URI" --all-tags
           echo "docker-tag=$TAG" >> $GITHUB_OUTPUT
           
-run-name: build-gf ${{ steps.run_tests.outputs.docker-tag }}
+run-name: build-gf ${{ steps.build_and_push_image.outputs.docker-tag }}
