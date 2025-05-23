@@ -1,5 +1,5 @@
 name: Build-gf
-run-name: build-gf ${{ inputs.environment }}
+run-name: build-gf ${{ steps.run_tests.outputs.docker-tag }}
 
 on:
   workflow_call:
@@ -60,22 +60,19 @@ jobs:
         run: |
           ECR_DOMAIN="$AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com"
           SHA_SHORT=$(git rev-parse --short HEAD)
-          echo "GITHUB_REF=$GITHUB_REF"
-          echo "GITHUB_REF_NAME=$GITHUB_REF_NAME"
-#
-#          aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_DOMAIN
-#
-#          ECR_REPO="ab2d-services"
-#          ECR_URI="$ECR_DOMAIN/$ECR_REPO"
-#
-#          TAG="$ECR_URI:contracts-service-$SHA_SHORT"
-#
-#          docker build -t $TAG .
-#
-#          # Push to special tag for promotion if this is run on a push to main
-#          if [ "$GITHUB_REF" == "refs/heads/main" ]; then
-#            echo "Tagging image for commit sha $SHA_SHORT"
-#            docker tag "$TAG" "$ECR_URI:contracts-service-main-$SHA_SHORT"
-#          fi
-#
-#          docker push "$ECR_URI" --all-tags
+
+          aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_DOMAIN
+
+          ECR_REPO="ab2d-services"
+          ECR_URI="$ECR_DOMAIN/$ECR_REPO"
+
+          if [ "$GITHUB_REF_NAME" == "main" ]; then
+            TAG="$ECR_URI:contracts-service-main-$SHA_SHORT"
+          else
+            TAG="$ECR_URI:contracts-service-$GITHUB_REF_NAME"
+          fi
+
+          docker build -t $TAG .
+          docker push "$ECR_URI" --all-tags
+          echo "docker-tag=$TAG" >> $GITHUB_OUTPUT
+          
