@@ -2,11 +2,17 @@ name: promote-contracts-gf
 run-name: promote-gf ${{ inputs.environment }}
 
 on:
+  push:
+    branches:
+      - more-workflows-gf
   workflow_call:
 #    inputs:
 #      environment:
 #        required: true
 #        type: string
+      sha_short:
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       sha_short:
