@@ -1,5 +1,5 @@
 name: promote-contracts-gf
-run-name: promote-gf ${{ inputs.environment }}
+run-name: promote-gf ${{ inputs.tag_suffix }}
 
 on:
   workflow_call:
