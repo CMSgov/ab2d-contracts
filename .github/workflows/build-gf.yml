@@ -74,5 +74,5 @@ jobs:
 
           docker build -t "$ECR_URI:$TAG_SHORT" .
           docker push "$ECR_URI" --all-tags
-          echo "Published **$TAG_SHORT to ECR" >> $GITHUB_STEP_SUMMARY
+          echo "Published **$TAG_SHORT** to ECR" >> $GITHUB_STEP_SUMMARY
           
