@@ -3,10 +3,10 @@ run-name: build-gf ${{ inputs.environment }}
 
 on:
   workflow_call:
-    inputs:
-      environment:
-        required: true
-        type: string
+#    inputs:
+#      environment:
+#        required: true
+#        type: string
   workflow_dispatch:
 #    inputs:
 #      environment:
