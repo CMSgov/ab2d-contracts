@@ -67,12 +67,12 @@ jobs:
           ECR_URI="$ECR_DOMAIN/$ECR_REPO"
 
           if [ "$GITHUB_REF_NAME" == "main" ]; then
-            TAG="$ECR_URI:contracts-service-main-$SHA_SHORT"
+            TAG_SHORT="contracts-service-main-$SHA_SHORT"
           else
-            TAG="$ECR_URI:contracts-service-$GITHUB_REF_NAME"
+            TAG_SHORT="contracts-service-$GITHUB_REF_NAME"
           fi
 
-          docker build -t $TAG .
+          docker build -t "$ECR_URI:$TAG_SHORT" .
           docker push "$ECR_URI" --all-tags
-          echo "Published $TAG to ECR" >> $GITHUB_STEP_SUMMARY
+          echo "Published **$TAG_SHORT to ECR" >> $GITHUB_STEP_SUMMARY
           
