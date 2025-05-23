@@ -1,5 +1,4 @@
 name: Build-gf
-run-name: build-gf ${{ steps.run_tests.outputs.docker-tag }}
 
 on:
   workflow_call:
@@ -76,3 +75,4 @@ jobs:
           docker push "$ECR_URI" --all-tags
           echo "docker-tag=$TAG" >> $GITHUB_OUTPUT
           
+run-name: build-gf ${{ steps.run_tests.outputs.docker-tag }}
