@@ -49,7 +49,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
           aws-region: ${{ vars.AWS_REGION }}
-          role-to-assume: arn:aws:iam::${{ secrets.GF_NON_PROD_ACCOUNT }}:role/delegatedadmin/developer/ab2d-sandbox-github-actions
+          role-to-assume: arn:aws:iam::${{ secrets.GF_NON_PROD_ACCOUNT }}:role/delegatedadmin/developer/ab2d-test-github-actions
 
       - name: Pull image from test ECR
         id: pull-image
