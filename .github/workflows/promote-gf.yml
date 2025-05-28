@@ -4,26 +4,15 @@ run-name: promote-gf ${{ inputs.tag_suffix }}
 on:
   workflow_call:
     inputs:
-#      environment:
-#        required: true
-#        type: string
       tag_suffix:
         required: true
         type: string
   workflow_dispatch:
     inputs:
       tag_suffix:
-        description: SHA
+        description: Docker tag suffix
         required: true
         type: string
-
-#      environment:
-#        description: AB2D environment
-#        required: true
-#        type: choice
-#        options:
-#          - sandbox
-#          - prod
 
 permissions:
   contents: read
