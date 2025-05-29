@@ -53,8 +53,11 @@ jobs:
           ECR_REPO="ab2d-contracts"
           ECR_URI="$ECR_DOMAIN/$ECR_REPO"
 
-          TAG_SHORT="contracts-service"
-
+          if [ "$GITHUB_REF_NAME" == "main" ]; then
+            TAG_SHORT="contracts-service-main-$SHA_SHORT"
+          else
+            TAG_SHORT="contracts-service-$GITHUB_REF_NAME"
+          fi
 
           docker build -t "$ECR_URI:$TAG_SHORT" .
           docker push "$ECR_URI" --all-tags
