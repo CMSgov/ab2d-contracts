@@ -40,10 +40,16 @@ jobs:
         with:
           aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/delegatedadmin/developer/ab2d-${{ env.AB2D_ENV }}-github-actions
-      - name: Deploy ECS service to run on latest image in ECR
-        env:
-          DEPLOYMENT_ENV: ab2d-${{ env.AB2D_ENV }}-microservice-cluster
+
+      - name: Test
         run: |
-          echo "Deploying contracts service"
-          aws ecs update-service --cluster "$DEPLOYMENT_ENV" --service ab2d-contracts-service --force-new-deployment > /dev/null
-          aws ecs wait services-stable --cluster "$DEPLOYMENT_ENV" --services ab2d-contracts-service
+          TASK_DEF=$(aws ecs list-task-definitions --family-prefix ab2d-dev-contracts-service-task-definition --query "taskDefinitionArns[0]" | tr -d '"')
+          echo "task definition=$TASK_DEF"
+
+#      - name: Deploy ECS service to run on latest image in ECR
+#        env:
+#          DEPLOYMENT_ENV: ab2d-${{ env.AB2D_ENV }}-microservice-cluster
+#        run: |
+#          echo "Deploying contracts service"
+#          aws ecs update-service --cluster "$DEPLOYMENT_ENV" --service ab2d-contracts-service --force-new-deployment > /dev/null
+#          aws ecs wait services-stable --cluster "$DEPLOYMENT_ENV" --services ab2d-contracts-service
