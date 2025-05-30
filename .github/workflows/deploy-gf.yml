@@ -30,7 +30,10 @@ jobs:
   apply_tofu:
     uses: cmsgov/ab2d/.github/workflows/terraform-microservices-gf.yml@gf-test--burling/ab2d-6692
     with:
+      environment: ${{ inputs.environment }}
       contracts_service_image: contract-service-${{ inputs.image_tag_suffix }}
+      apply: false
+
 
   deploy:
     permissions:
