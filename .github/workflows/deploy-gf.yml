@@ -39,6 +39,7 @@ jobs:
 
 
   deploy:
+    needs: apply_tofu
     permissions:
       contents: read
       id-token: write
