@@ -21,12 +21,17 @@ on:
           - test
           - sandbox
           - prod
-      tag_suffix:
-        description: Docker tag suffix
+      image_tag_suffix:
+        description: Image tag suffix
         required: true
         type: string
 
 jobs:
+  apply_tofu:
+    uses: cmsgov/ab2d/.github/workflows/terraform-microservices-gf.yml@gf-test--burling/ab2d-6692
+    with:
+      contracts_service_image: contract-service-${{ inputs.image_tag_suffix }}
+
   deploy:
     permissions:
       contents: read
@@ -41,10 +46,14 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/delegatedadmin/developer/ab2d-${{ env.AB2D_ENV }}-github-actions
 
-      - name: Test
+      - name: Run tofu apply
+        env:
+          ECS_FAMILY_PREFIX: ab2d-dev-contracts-service-task-definition
         run: |
-          TASK_DEF=$(aws ecs list-task-definitions --family-prefix ab2d-dev-contracts-service-task-definition --query "taskDefinitionArns[0]" | tr -d '"')
+          TASK_DEF=$(aws ecs list-task-definitions --family-prefix $ECS_FAMILY_PREFIX --query "taskDefinitionArns[0]" | tr -d '"')
           echo "task definition=$TASK_DEF"
+
+
 
 #      - name: Deploy ECS service to run on latest image in ECR
 #        env:
