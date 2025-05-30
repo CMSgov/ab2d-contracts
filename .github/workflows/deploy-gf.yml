@@ -2,6 +2,9 @@ name: Deploy contracts GF
 run-name: deploy-gf ${{ inputs.environment }}
 
 on:
+  push:
+    branches:
+      - more-workflows-gf
   workflow_call:
     inputs:
       environment:
