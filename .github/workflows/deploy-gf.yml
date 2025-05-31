@@ -37,6 +37,7 @@ jobs:
       contracts_service_image: contract-service-${{ inputs.image_tag_suffix }}
       apply: false
       runs_on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
+      ref: gf-test--burling/ab2d-6692
     secrets:
       NON_PROD_ACCOUNT: ${{ secrets.GF_NON_PROD_ACCOUNT }}
 
