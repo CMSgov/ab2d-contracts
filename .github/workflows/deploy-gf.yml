@@ -69,7 +69,7 @@ jobs:
           # Query the latest task definition (there should be only one) and extract ECR image digest
           TASK_DEF=$(aws ecs list-task-definitions --status ACTIVE --family-prefix $ECS_FAMILY_PREFIX --query "taskDefinitionArns[0]" | tr -d '"')
           TASK_DEF_IMAGE=$(aws ecs describe-task-definition --task-definition $TASK_DEF --query "taskDefinition.containerDefinitions[0].image")
-          TASK_DEF_IMAGE_DIGEST=$(echo TASK_DEF_IMAGE | cut -d "@" -f2 | tr -d '"')
+          TASK_DEF_IMAGE_DIGEST=$(echo $TASK_DEF_IMAGE | cut -d "@" -f2 | tr -d '"')
           
           # Query ECR image by $IMAGE_TAG (there should be only one) and verify digests match
           ECR_IMAGE_DIGEST=$(aws ecr describe-images --repository-name $ECR_REPO --image-ids imageTag=$IMAGE_TAG | jq '.imageDetails[0].imageDigest' | tr -d '"')
