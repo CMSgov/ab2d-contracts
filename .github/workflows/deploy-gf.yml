@@ -31,13 +31,13 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    uses: cmsgov/ab2d/.github/workflows/terraform-microservices-gf.yml@gf-test--burling/ab2d-6692 # TODO use main
+    uses: cmsgov/ab2d/.github/workflows/terraform-microservices-gf.yml@main
 
     with:
       environment: ${{ inputs.environment }}
       contracts_service_image: contracts-service-${{ inputs.image_tag_suffix }}
       apply: true
-      ref: gf-test--burling/ab2d-6692 # TODO use main
+      ref: main
       runner: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
     secrets:
       aws_account: ${{contains(fromJSON('["dev", "test"]'), inputs.environment) && secrets.GF_NON_PROD_ACCOUNT || secrets.GF_PROD_ACCOUNT}}
@@ -65,20 +65,19 @@ jobs:
           ECR_REPO: ab2d-contracts
           IMAGE_TAG: contracts-service-${{ inputs.image_tag_suffix }}
         run: |
-          TASK_DEF=$(aws ecs list-task-definitions --family-prefix $ECS_FAMILY_PREFIX --query "taskDefinitionArns[0]" | tr -d '"')
-          echo "task definition=$TASK_DEF"
-          ECR_IMAGE=$(aws ecs describe-task-definition --task-definition $TASK_DEF --query "taskDefinition.containerDefinitions[0].image")
-          echo "ecr image=$ECR_IMAGE"
-
-          ECR_IMAGE_DIGEST=$(echo $ECR_IMAGE | cut -d "@" -f2 | tr -d '"')
-          echo "ECR_IMAGE_DIGEST=$ECR_IMAGE_DIGEST"
-          DIGEST=$(aws ecr describe-images --repository-name $ECR_REPO --image-ids imageTag=$IMAGE_TAG | jq '.imageDetails[0]'.imageDigest | tr -d '"')
-          echo "DIGEST=$DIGEST"
+          set -e
+          # Query the latest task definition (there should be only one) and extract ECR image digest
+          TASK_DEF=$(aws ecs list-task-definitions --status ACTIVE --family-prefix $ECS_FAMILY_PREFIX --query "taskDefinitionArns[0]" | tr -d '"')
+          TASK_DEF_IMAGE=$(aws ecs describe-task-definition --task-definition $TASK_DEF --query "taskDefinition.containerDefinitions[0].image")
+          TASK_DEF_IMAGE_DIGEST=$(echo TASK_DEF_IMAGE | cut -d "@" -f2 | tr -d '"')
           
-          if [[ "$ECR_IMAGE_DIGEST" != "$DIGEST" ]]; then
+          # Query ECR image by $IMAGE_TAG (there should be only one) and verify digests match
+          ECR_IMAGE_DIGEST=$(aws ecr describe-images --repository-name $ECR_REPO --image-ids imageTag=$IMAGE_TAG | jq '.imageDetails[0]'.imageDigest | tr -d '"')
+          if [[ "$ECR_IMAGE_DIGEST" != "TASK_DEF_IMAGE_DIGEST" ]]; then
             echo "Image digests do not match"
             exit 1
           fi
+          
           aws ecs update-service --cluster "$CLUSTER" --service $ECS_SERVICE --task-definition $TASK_DEF --force-new-deployment >/dev/null
           aws ecs wait services-stable --cluster "$CLUSTER" --services $ECS_SERVICE
 
