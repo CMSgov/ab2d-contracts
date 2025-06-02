@@ -73,7 +73,7 @@ jobs:
           
           # Query ECR image by $IMAGE_TAG (there should be only one) and verify digests match
           ECR_IMAGE_DIGEST=$(aws ecr describe-images --repository-name $ECR_REPO --image-ids imageTag=$IMAGE_TAG | jq '.imageDetails[0].imageDigest' | tr -d '"')
-          if [[ "$ECR_IMAGE_DIGEST" != "TASK_DEF_IMAGE_DIGEST" ]]; then
+          if [[ "$ECR_IMAGE_DIGEST" != "$TASK_DEF_IMAGE_DIGEST" ]]; then
             echo "Image digests do not match"
             echo "TASK_DEF_IMAGE_DIGEST=$TASK_DEF_IMAGE_DIGEST"
             echo "ECR_IMAGE_DIGEST=$ECR_IMAGE_DIGEST"
