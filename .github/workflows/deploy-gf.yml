@@ -23,7 +23,7 @@ on:
           - prod
       image_tag_suffix:
         description: Image tag suffix
-        required: true
+        required: false
         type: string
 
 jobs:
@@ -35,7 +35,7 @@ jobs:
 
     with:
       environment: ${{ inputs.environment }}
-      contracts_service_image: contracts-service-${{ inputs.image_tag_suffix }}
+      contracts_service_image: contracts-service-${{ inputs.image_tag_suffix || github.ref }}
       apply: true
       ref: main
       runner: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
@@ -79,6 +79,8 @@ jobs:
             echo "ECR_IMAGE_DIGEST=$ECR_IMAGE_DIGEST"
             exit 1
           fi
+            
+          echo "**Deployed $TASK_DEF to $AB2D_ENV**" >> $GITHUB_STEP_SUMMARY
           
           aws ecs update-service --cluster "$CLUSTER" --service $ECS_SERVICE --task-definition $TASK_DEF --force-new-deployment >/dev/null
           aws ecs wait services-stable --cluster "$CLUSTER" --services $ECS_SERVICE
