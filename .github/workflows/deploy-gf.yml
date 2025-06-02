@@ -61,15 +61,15 @@ jobs:
       - name: Inspect task definition, extract image, deploy
         env:
           ECS_FAMILY_PREFIX: ab2d-dev-contracts-service
-          DEPLOYMENT_ENV: ab2d-dev-microservice-cluster
+          DEPLOYMENT_ENV: ab2d-dev-microservices
         run: |
           TASK_DEF=$(aws ecs list-task-definitions --family-prefix $ECS_FAMILY_PREFIX --query "taskDefinitionArns[0]" | tr -d '"')
           echo "task definition=$TASK_DEF"
           ECR_IMAGE=$(aws ecs describe-task-definition --task-definition $TASK_DEF --query "taskDefinition.containerDefinitions[0].image")
           echo "ecr image=$ECR_IMAGE"
           
-          aws ecs update-service --cluster "$DEPLOYMENT_ENV" --service ab2d-contracts-service --task-definition $TASK_DEF --force-new-deployment > /dev/null
-          aws ecs wait services-stable --cluster "$DEPLOYMENT_ENV" --services ab2d-contracts-service
+          aws ecs update-service --cluster "$DEPLOYMENT_ENV" --service ab2d-dev-contracts-service --task-definition $TASK_DEF --force-new-deployment > /dev/null
+          aws ecs wait services-stable --cluster "$DEPLOYMENT_ENV" --services ab2d-dev-contracts-service
 
 #      - name: Deploy ECS service to run on latest image in ECR
 #        env:
