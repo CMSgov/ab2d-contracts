@@ -67,7 +67,6 @@ jobs:
           echo "task definition=$TASK_DEF"
           ECR_IMAGE=$(aws ecs describe-task-definition --task-definition $TASK_DEF --query "taskDefinition.containerDefinitions[0].image")
           echo "ecr image=$ECR_IMAGE"
-          
           aws ecs update-service --cluster "$DEPLOYMENT_ENV" --service ab2d-dev-contracts-service --task-definition $TASK_DEF --force-new-deployment > /dev/null
           aws ecs wait services-stable --cluster "$DEPLOYMENT_ENV" --services ab2d-dev-contracts-service
 
