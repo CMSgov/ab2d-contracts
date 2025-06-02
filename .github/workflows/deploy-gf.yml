@@ -61,7 +61,7 @@ jobs:
       - name: Inspect task definition, extract image, deploy
         env:
           ECS_FAMILY_PREFIX: ab2d-dev-contracts
-          ECS_SERVICE: ab2d-dev-contracts-service
+          ECS_SERVICE: ab2d-dev-contracts
           DEPLOYMENT_ENV: ab2d-dev-microservices
         run: |
           TASK_DEF=$(aws ecs list-task-definitions --family-prefix $ECS_FAMILY_PREFIX --query "taskDefinitionArns[0]" | tr -d '"')
