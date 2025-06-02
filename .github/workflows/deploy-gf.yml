@@ -31,7 +31,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    uses: cmsgov/ab2d/.github/workflows/terraform-microservices-gf.yml@gf-test--burling/ab2d-6692
+    uses: cmsgov/ab2d/.github/workflows/terraform-microservices-gf.yml@gf-test--burling/ab2d-6692 # TODO set to main
 
     with:
       environment: ${{ inputs.environment }}
@@ -72,9 +72,11 @@ jobs:
           TASK_DEF_IMAGE_DIGEST=$(echo TASK_DEF_IMAGE | cut -d "@" -f2 | tr -d '"')
           
           # Query ECR image by $IMAGE_TAG (there should be only one) and verify digests match
-          ECR_IMAGE_DIGEST=$(aws ecr describe-images --repository-name $ECR_REPO --image-ids imageTag=$IMAGE_TAG | jq '.imageDetails[0]'.imageDigest | tr -d '"')
+          ECR_IMAGE_DIGEST=$(aws ecr describe-images --repository-name $ECR_REPO --image-ids imageTag=$IMAGE_TAG | jq '.imageDetails[0].imageDigest' | tr -d '"')
           if [[ "$ECR_IMAGE_DIGEST" != "TASK_DEF_IMAGE_DIGEST" ]]; then
             echo "Image digests do not match"
+            echo "TASK_DEF_IMAGE_DIGEST=$TASK_DEF_IMAGE_DIGEST"
+            echo "ECR_IMAGE_DIGEST=$ECR_IMAGE_DIGEST"
             exit 1
           fi
           
