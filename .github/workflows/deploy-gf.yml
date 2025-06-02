@@ -70,9 +70,9 @@ jobs:
           ECR_IMAGE=$(aws ecs describe-task-definition --task-definition $TASK_DEF --query "taskDefinition.containerDefinitions[0].image")
           echo "ecr image=$ECR_IMAGE"
 
-          ECR_IMAGE_DIGEST=$(echo $ECR_IMAGE | cut -d "@" -f2)
+          ECR_IMAGE_DIGEST=$(echo $ECR_IMAGE | cut -d "@" -f2 | tr -d '"')
           echo "ECR_IMAGE_DIGEST=$ECR_IMAGE_DIGEST"
-          DIGEST=$(aws ecr describe-images --repository-name $ECR_REPO --image-ids imageTag=$IMAGE_TAG | jq '.imageDetails[0]'.imageDigest)
+          DIGEST=$(aws ecr describe-images --repository-name $ECR_REPO --image-ids imageTag=$IMAGE_TAG | jq '.imageDetails[0]'.imageDigest | tr -d '"')
           echo "DIGEST=$DIGEST"
           
           if [[ "$ECR_IMAGE_DIGEST" != "$DIGEST" ]]; then
