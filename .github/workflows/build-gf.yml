@@ -5,12 +5,17 @@ on:
   workflow_call:
   workflow_dispatch:
 
+env:
+  RUNNER_PREFIX: "codebuild-ab2d-contracts-"
+  ECR_REPO: ab2d-contracts
+  TAG_PREFIX: contracts-service
+
 jobs:
   build:
     permissions:
       contents: read
       id-token: write
-    runs-on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
+    runs-on: ${{env.RUNNER_PREFIX}}-${{github.run_id}}-${{github.run_attempt}}
     env:
       AWS_ACCOUNT: ${{ secrets.GF_NON_PROD_ACCOUNT }}
     steps:
@@ -43,9 +48,6 @@ jobs:
           gradle -b build.gradle bootJar -Dset.root.project.build.filename=true
 
       - name: Build and push docker image
-        env:
-          ECR_REPO: ab2d-contracts
-          TAG_PREFIX: contracts-service
         run: |
           ECR_DOMAIN="$AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com"
           SHA_SHORT=$(git rev-parse --short HEAD)
