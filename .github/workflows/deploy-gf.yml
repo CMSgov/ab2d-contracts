@@ -77,6 +77,7 @@ jobs:
           
           if [[ "$ECR_IMAGE_DIGEST" != "$DIGEST" ]]; then
             echo "Image digests do not match"
+            exit 1
           fi
           aws ecs update-service --cluster "$CLUSTER" --service $ECS_SERVICE --task-definition $TASK_DEF --force-new-deployment >/dev/null
           aws ecs wait services-stable --cluster "$CLUSTER" --services $ECS_SERVICE
