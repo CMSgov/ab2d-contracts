@@ -26,6 +26,10 @@ on:
         required: true
         type: string
 
+env:
+  AWS_ACCOUNT: ${{contains(fromJSON('["dev", "test"]'), inputs.environment) && secrets.GF_NON_PROD_ACCOUNT || secrets.GF_PROD_ACCOUNT}}
+  AB2D_ENV: ${{ inputs.environment }}
+
 jobs:
   apply_tofu:
     permissions:
@@ -33,13 +37,13 @@ jobs:
       id-token: write
     uses: cmsgov/ab2d/.github/workflows/terraform-microservices-gf.yml@gf-test--burling/ab2d-6692
     with:
-      environment: ${{ inputs.environment }}
+      environment: ${{ env.AB2D_ENV }}
       contracts_service_image: contract-service-${{ inputs.image_tag_suffix }}
-      apply: false
-      runs_on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
+      apply: false # TODO set to true
+      runner: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
       ref: gf-test--burling/ab2d-6692
     secrets:
-      NON_PROD_ACCOUNT: ${{ secrets.GF_NON_PROD_ACCOUNT }}
+      aws_account: ${{ env.AWS_ACCOUNT }}
 
   deploy:
     needs: apply_tofu
@@ -47,9 +51,7 @@ jobs:
       contents: read
       id-token: write
     runs-on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
-    env:
-      AWS_ACCOUNT: ${{contains(fromJSON('["dev", "test"]'), inputs.environment) && secrets.GF_NON_PROD_ACCOUNT || secrets.GF_PROD_ACCOUNT}}
-      AB2D_ENV: ${{ inputs.environment }}
+
     steps:
       - uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
         with:
