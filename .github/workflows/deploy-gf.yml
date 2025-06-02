@@ -60,7 +60,7 @@ jobs:
 
       - name: Inspect task definition, extract image, deploy
         env:
-          ECS_FAMILY_PREFIX: ab2d-dev-contracts-service
+          ECS_FAMILY_PREFIX: ab2d-dev-contracts
           ECS_SERVICE: ab2d-dev-contracts-service
           DEPLOYMENT_ENV: ab2d-dev-microservices
         run: |
