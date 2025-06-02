@@ -31,7 +31,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    uses: cmsgov/ab2d/.github/workflows/terraform-microservices-gf.yml@main
+    uses: cmsgov/ab2d/.github/workflows/terraform-microservices-gf.yml@gf-test--burling/ab2d-6692
 
     with:
       environment: ${{ inputs.environment }}
@@ -59,9 +59,9 @@ jobs:
 
       - name: Inspect task definition, extract image, deploy
         env:
+          CLUSTER: ab2d-${{ env.AB2D_ENV }}-microservices
           ECS_FAMILY_PREFIX: ab2d-${{ env.AB2D_ENV }}-contracts
           ECS_SERVICE: ab2d-${{ env.AB2D_ENV }}-contracts
-          CLUSTER: ab2d-${{ env.AB2D_ENV }}-microservices
           ECR_REPO: ab2d-contracts
           IMAGE_TAG: contracts-service-${{ inputs.image_tag_suffix }}
         run: |
