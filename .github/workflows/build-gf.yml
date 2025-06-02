@@ -56,7 +56,7 @@ jobs:
           if [ "$GITHUB_REF_NAME" == "main" ]; then
             TAG_SHORT="$TAG_PREFIX-main-$SHA_SHORT"
           else
-            TAG_SHORT="$TAG_PREFIX-$GITHUB_REF_NAME-test"
+            TAG_SHORT="$TAG_PREFIX-$GITHUB_REF_NAME"
           fi
 
           docker build -t "$ECR_URI:$TAG_SHORT" .
