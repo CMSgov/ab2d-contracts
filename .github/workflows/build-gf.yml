@@ -5,19 +5,19 @@ on:
   workflow_call:
   workflow_dispatch:
 
-env:
-  RUNNER_PREFIX: "codebuild-ab2d-contracts-"
-  ECR_REPO: ab2d-contracts
-  TAG_PREFIX: contracts-service
+
 
 jobs:
   build:
+    env:
+      RUNNER_PREFIX: "codebuild-ab2d-contracts-"
+      ECR_REPO: ab2d-contracts
+      TAG_PREFIX: contracts-service
+      AWS_ACCOUNT: ${{ secrets.GF_NON_PROD_ACCOUNT }}
     permissions:
       contents: read
       id-token: write
     runs-on: ${{env.RUNNER_PREFIX}}-${{github.run_id}}-${{github.run_attempt}}
-    env:
-      AWS_ACCOUNT: ${{ secrets.GF_NON_PROD_ACCOUNT }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
