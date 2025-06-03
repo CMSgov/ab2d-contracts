@@ -26,7 +26,7 @@ jobs:
     runs-on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
     env:
       TAG_NAME: contracts-service-${{ inputs.image_tag_suffix || github.ref }}
-      SOURCE_REPO: ab2d-services
+      SOURCE_REPO: ab2d-contracts
     steps:
       - name: Define destination repo
         id: repos

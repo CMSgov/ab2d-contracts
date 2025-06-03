@@ -84,4 +84,4 @@ jobs:
           aws ecs update-service --cluster "$CLUSTER" --service $ECS_SERVICE --task-definition $TASK_DEF --force-new-deployment >/dev/null
           aws ecs wait services-stable --cluster "$CLUSTER" --services $ECS_SERVICE
 
-          echo "Deployed $TASK_DEF to $AB2D_ENV" >> $GITHUB_STEP_SUMMARY
+          echo "Deployed `$TASK_DEF` to **$AB2D_ENV**" >> $GITHUB_STEP_SUMMARY
