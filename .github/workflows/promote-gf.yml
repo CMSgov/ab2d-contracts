@@ -11,7 +11,7 @@ on:
     inputs:
       image_tag_suffix:
         description: Docker tag suffix
-        required: true
+        required: false
         type: string
 
 permissions:
@@ -25,7 +25,7 @@ jobs:
       id-token: write
     runs-on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
     env:
-      TAG_NAME: contracts-service-${{ inputs.image_tag_suffix }}
+      TAG_NAME: contracts-service-${{ inputs.image_tag_suffix || github.ref }}
       SOURCE_REPO: ab2d-services
     steps:
       - name: Define destination repo
