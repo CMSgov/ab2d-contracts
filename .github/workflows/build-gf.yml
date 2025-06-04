@@ -2,6 +2,7 @@ name: Build-gf
 run-name: build-gf
 
 on:
+  push:
   workflow_call:
   workflow_dispatch:
 
@@ -29,6 +30,7 @@ jobs:
 
       - uses: cmsgov/ab2d-bcda-dpc-platform/actions/aws-params-env-action@main
         with:
+          #FIXME use more better artifactory settings
           params: |
             ARTIFACTORY_URL=/artifactory/url
             ARTIFACTORY_USER=/artifactory/user
