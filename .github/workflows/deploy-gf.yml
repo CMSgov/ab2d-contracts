@@ -40,22 +40,22 @@ jobs:
       runner: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
     secrets:
       aws_account: ${{contains(fromJSON('["dev", "test"]'), inputs.environment) && secrets.GF_NON_PROD_ACCOUNT || secrets.GF_PROD_ACCOUNT}}
-
-  deploy:
-    needs: apply_tofu
-    permissions:
-      contents: read
-      id-token: write
-    runs-on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
-    env:
-      AWS_ACCOUNT: ${{contains(fromJSON('["dev", "test"]'), inputs.environment) && secrets.GF_NON_PROD_ACCOUNT || secrets.GF_PROD_ACCOUNT}}
-      AB2D_ENV: ${{ inputs.environment }}
-    steps:
-      - uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
-        with:
-          aws-region: ${{ vars.AWS_REGION }}
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/delegatedadmin/developer/ab2d-${{ env.AB2D_ENV }}-github-actions
-
+#
+#  deploy:
+#    needs: apply_tofu
+#    permissions:
+#      contents: read
+#      id-token: write
+#    runs-on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
+#    env:
+#      AWS_ACCOUNT: ${{contains(fromJSON('["dev", "test"]'), inputs.environment) && secrets.GF_NON_PROD_ACCOUNT || secrets.GF_PROD_ACCOUNT}}
+#      AB2D_ENV: ${{ inputs.environment }}
+#    steps:
+#      - uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
+#        with:
+#          aws-region: ${{ vars.AWS_REGION }}
+#          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/delegatedadmin/developer/ab2d-${{ env.AB2D_ENV }}-github-actions
+#
 #      - name: Inspect task definition, extract image, deploy
 #        env:
 #          CLUSTER: ab2d-${{ env.AB2D_ENV }}-microservices
