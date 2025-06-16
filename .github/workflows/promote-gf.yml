@@ -1,5 +1,5 @@
-name: promote-contracts-gf
-run-name: promote-gf ${{ inputs.tag_suffix }}
+name: promote-gf
+run-name: promote-gf ${{ inputs.image_tax_prefix }}
 
 on:
   workflow_call:
@@ -28,7 +28,7 @@ jobs:
       TAG_NAME: contracts-service-${{ inputs.image_tag_suffix || github.ref }}
       SOURCE_REPO: ab2d-contracts
     steps:
-      - name: Define destination repo # TODO change DEST_REPO to 'ab2d-contracts' after terraform has been applied
+      - name: Define destination repo
         id: repos
         run: |
           echo "DEST_REPO=ab2d-contracts" >> $GITHUB_OUTPUT 
