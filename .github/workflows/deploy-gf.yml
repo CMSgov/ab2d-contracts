@@ -31,7 +31,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    uses: cmsgov/ab2d/.github/workflows/terraform-microservices-gf.yml@more-workflows-gf # TODO set to main
+    uses: cmsgov/ab2d/.github/workflows/terraform-microservices-gf.yml@main # TODO set to main
     with:
       environment: ${{ inputs.environment }}
       contracts_service_image: contracts-service-${{ inputs.image_tag_suffix || github.ref }}
