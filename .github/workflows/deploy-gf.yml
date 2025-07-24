@@ -1,5 +1,5 @@
 name: Deploy contracts GF
-run-name: deploy-gf ${{ inputs.environment }} ${{ inputs.image_tag_suffix }}
+run-name: deploy-gf ${{ inputs.environment }} ${{ inputs.image_tag }}
 
 on:
   workflow_call:
@@ -7,7 +7,7 @@ on:
       environment:
         required: true
         type: string
-      tag_suffix:
+      image_tag:
         required: true
         type: string
   workflow_dispatch:
@@ -21,9 +21,9 @@ on:
           - test
           - sandbox
           - prod
-      image_tag_suffix:
-        description: Image tag suffix
-        required: false
+      image_tag:
+        description: ECR image tag for selected module (contracts-service-<branch>-<SHA>)
+        required: true
         type: string
 
 jobs:
@@ -31,10 +31,10 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    uses: cmsgov/ab2d/.github/workflows/terraform-microservices-gf.yml@main # TODO set to main
+    uses: cmsgov/ab2d/.github/workflows/terraform-microservices-gf.yml@main
     with:
       environment: ${{ inputs.environment }}
-      contracts_service_image: contracts-service-${{ inputs.image_tag_suffix || github.ref }}
+      contracts_service_image: ${{ inputs.image_tag }}
       apply: true
       ref: main
       runner: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
