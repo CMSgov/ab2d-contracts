@@ -1,5 +1,5 @@
 name: Build & deploy contracts
-run-name: Build & deploy
+run-name: build-deploy ${{ inputs.environment }}
 
 permissions:
   contents: read

@@ -5,31 +5,35 @@ on:
   workflow_call:
     outputs:
       image_tag:
-        description: "ECR image tag"
+        description: "Image tag pushed to non-prod ECR"
         value: ${{ jobs.build.outputs.image_tag }}
   workflow_dispatch:
 
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  ECR_REPO: ab2d-contracts
+  TAG_PREFIX: contracts-service
+  AWS_ACCOUNT: ${{ secrets.GF_NON_PROD_ACCOUNT }}
+  RUNNER: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
+
 jobs:
   build:
+    runs-on: ${{ env.RUNNER }}
     outputs:
       image_tag: ${{ steps.build_image.outputs.image_tag }}
-    runs-on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
-    env:
-      ECR_REPO: ab2d-contracts
-      TAG_PREFIX: contracts-service
-      AWS_ACCOUNT: ${{ secrets.GF_NON_PROD_ACCOUNT }}
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - uses: actions/setup-java@8df1039502a15bceb9433410b1a100fbe190c53b # v4.5.0
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
         with:
           distribution: 'adopt'
           java-version: '17'
 
-      - uses: gradle/actions/setup-gradle@0bdd871935719febd78681f197cd39af5b6e16a6 # v4.2.2
+      - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 8.4
 
@@ -41,7 +45,7 @@ jobs:
             ARTIFACTORY_PASSWORD=/artifactory/password
 
       - name: Assume role in target account
-        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/delegatedadmin/developer/ab2d-dev-github-actions
@@ -55,10 +59,10 @@ jobs:
         run: |
           ECR_DOMAIN="$AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com"
           SHA_SHORT=$(git rev-parse --short HEAD)
-          aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_DOMAIN
           ECR_URI="$ECR_DOMAIN/$ECR_REPO"
           BRANCH_NAME_FORMATTED=${GITHUB_REF_NAME//\//-}
           TAG_SHORT="$TAG_PREFIX-$BRANCH_NAME_FORMATTED-$SHA_SHORT"
+          aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_DOMAIN
           docker build -t "$ECR_URI:$TAG_SHORT" .
           docker push "$ECR_URI" --all-tags
           echo "Published **$ECR_URI:$TAG_SHORT**" >> $GITHUB_STEP_SUMMARY

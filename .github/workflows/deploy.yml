@@ -22,15 +22,16 @@ on:
           - sandbox
           - prod
       image_tag:
-        description: ECR image tag for selected module (contracts-service-<branch>-<SHA>)
+        description: ECR image tag (contracts-service-<branch>-<SHA>)
         required: true
         type: string
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   apply_tofu:
-    permissions:
-      contents: read
-      id-token: write
     uses: cmsgov/ab2d/.github/workflows/terraform-microservices-gf.yml@main
     with:
       environment: ${{ inputs.environment }}
