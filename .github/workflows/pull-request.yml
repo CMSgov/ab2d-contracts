@@ -2,14 +2,17 @@ name: pull request jobs
 
 on:
   pull_request:
+  push:
+    branches:
+      - AB2D-6840/fix_ci
 
 jobs:
   test:
-    uses: ./.github/workflows/test.yml
+    uses: ./.github/workflows/test-gf.yml
     secrets: inherit
   build:
     needs: test
-    uses: ./.github/workflows/build.yml
+    uses: ./.github/workflows/build-gf.yml
     with:
       environment: test
     secrets: inherit

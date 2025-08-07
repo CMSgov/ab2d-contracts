@@ -43,12 +43,8 @@ jobs:
             ARTIFACTORY_PASSWORD=/artifactory/password
             SONAR_HOST_URL=/sonarqube/url
             SONAR_TOKEN=/sonarqube/token
-
-      - uses: aws-actions/aws-secretsmanager-get-secrets@fbd65ea98e018858715f591f03b251f02b2316cb #v2.0.8
-        with:
-          secret-ids: |
-            HPMS_AUTH_KEY_ID, ab2d/ab2d-east-impl/module/db/ab2d_hpms_auth_key_id/2020-01-02-09-15-01
-            HPMS_AUTH_KEY_SECRET, ab2d/ab2d-east-impl/module/db/ab2d_hpms_auth_key_secret/2020-01-02-09-15-01
+            HPMS_AUTH_KEY_ID=/ab2d/dev/core/sensitive/hpms_auth_key_id
+            HPMS_AUTH_KEY_SECRET=/ab2d/dev/core/sensitive/hpms_auth_key_secret
 
       - name: Build files
         run: |
