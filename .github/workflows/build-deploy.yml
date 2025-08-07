@@ -1,0 +1,42 @@
+name: Build & deploy contracts
+
+permissions:
+  contents: read
+  id-token: write
+
+on:
+  push:
+    branches:
+      - AB2D-6840/fix_ci
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      image_tag:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: AB2D environment
+        required: true
+        type: choice
+        options:
+          - dev
+          - test
+      image_tag:
+        description: ECR image tag for selected module (contracts-service-<branch>-<SHA>)
+        required: true
+        type: string
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+    secrets: inherit
+  deploy:
+    needs: [test]
+    uses: ./.github/workflows/deploy.yml
+    with:
+      IMAGE_TAG: ${{ needs.build.outputs.image_tag }}
+    secrets: inherit

@@ -1,5 +1,5 @@
-name: promote-gf
-run-name: promote-gf ${{ inputs.image_tax_prefix }}
+name: Promote contracts
+run-name: promote ${{ inputs.image_tax_prefix }}
 
 on:
   workflow_call:
@@ -9,9 +9,9 @@ on:
         type: string
   workflow_dispatch:
     inputs:
-      image_tag_suffix:
-        description: Docker tag suffix
-        required: false
+      image_tag:
+        description: ECR image tag for selected module (contracts-service-<branch>-<SHA>)
+        required: true
         type: string
 
 permissions:
@@ -25,7 +25,7 @@ jobs:
       id-token: write
     runs-on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
     env:
-      TAG_NAME: contracts-service-${{ inputs.image_tag_suffix || github.ref }}
+      TAG_NAME: ${{ inputs.image_tag }}
       SOURCE_REPO: ab2d-contracts
     steps:
       - name: Define destination repo

@@ -1,5 +1,5 @@
-name: Deploy contracts GF
-run-name: deploy-gf ${{ inputs.environment }} ${{ inputs.image_tag }}
+name: Deploy contracts
+run-name: deploy ${{ inputs.environment }} ${{ inputs.image_tag }}
 
 on:
   workflow_call:

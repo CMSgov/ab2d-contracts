@@ -1,4 +1,4 @@
-name: Unit tests and static analysis GF
+name: Unit tests + SonarQube
 
 on:
   workflow_call:

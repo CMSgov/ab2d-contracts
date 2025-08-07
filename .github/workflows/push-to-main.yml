@@ -1,9 +1,9 @@
-name: Pull request
+name: Push to main
 
 on:
-  pull_request:
-#  push:
-#    branches:
+  push:
+    branches:
+      - main
 #      - AB2D-6840/fix_ci
 
 permissions:
