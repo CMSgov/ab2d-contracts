@@ -21,14 +21,13 @@ on:
           - dev
           - test
 
-
 jobs:
   build:
-    uses: ./.github/workflows/build-minimal.yml
+    uses: ./.github/workflows/build.yml
     secrets: inherit
   deploy:
     needs: [build]
-    uses: ./.github/workflows/deploy-minimal.yml
+    uses: ./.github/workflows/deploy.yml
     with:
       environment: ${{ inputs.environment }}
       image_tag: ${{ needs.build.outputs.image_tag }}

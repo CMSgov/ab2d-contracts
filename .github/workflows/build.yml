@@ -9,7 +9,6 @@ on:
         value: ${{ jobs.build.outputs.image_tag }}
   workflow_dispatch:
 
-
 jobs:
   build:
     outputs:
