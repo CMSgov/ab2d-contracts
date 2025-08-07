@@ -3,6 +3,10 @@ run-name: build
 
 on:
   workflow_call:
+    outputs:
+      image_tag:
+        description: "ECR image tag"
+        value: ${{ jobs.build.outputs.image_tag }}
   workflow_dispatch:
 
 jobs:

@@ -21,6 +21,7 @@ on:
           - dev
           - test
 
+
 jobs:
   build:
     uses: ./.github/workflows/build-minimal.yml
