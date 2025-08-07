@@ -48,7 +48,7 @@ jobs:
           gradle sonar \
             -Dsonar.ci.autoconfig.disabled=true \
             -Dsonar.projectKey=ab2d-contracts \
-            -Dsonar.host.url=https://sonarqube.cloud.cms.gov \
+            -Dsonar.host.url=$SONAR_HOST_URL \
             -Dsonar.login=$SONAR_TOKEN
 
       - name: Quality Gate

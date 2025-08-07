@@ -5,11 +5,9 @@ on:
   workflow_call:
     inputs:
       run_tests:
-        description: Run tests
         type: boolean
         default: true
       run_sonar:
-        description: Run SonarQube
         type: boolean
         default: true
     outputs:
@@ -17,6 +15,15 @@ on:
         description: Image tag pushed to non-prod ECR
         value: ${{ jobs.build.outputs.image_tag }}
   workflow_dispatch:
+    inputs:
+      run_tests:
+        description: Run tests
+        type: boolean
+        default: true
+      run_sonar:
+        description: Run SonarQube
+        type: boolean
+        default: true
 
 permissions:
   contents: read
