@@ -3,18 +3,23 @@ name: Push to main
 on:
   push:
     branches:
-      - main
-#      - AB2D-6840/fix_ci
+#      - main
+      - AB2D-6840/fix_ci
 
 permissions:
   contents: read
   id-token: write
 
 jobs:
-  test:
-    uses: ./.github/workflows/test.yml
+  build-deploy-dev:
+    uses: ./.github/workflows/build-deploy.yml
+    with:
+      environment: dev
     secrets: inherit
-  build:
-    needs: [test]
-    uses: ./.github/workflows/build.yml
-    secrets: inherit
+
+#  build-deploy-test:
+#    uses: ./.github/workflows/build-deploy.yml
+#    with:
+#      environment: test
+#    secrets: inherit
+
