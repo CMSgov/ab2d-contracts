@@ -44,6 +44,12 @@ jobs:
         with:
           gradle-version: 8.4
 
+      - name: Assume role in target account
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/delegatedadmin/developer/ab2d-dev-github-actions
+
       - uses: cmsgov/cdap/actions/aws-params-env-action@main
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
@@ -56,12 +62,6 @@ jobs:
             SONAR_TOKEN=/sonarqube/token
             HPMS_AUTH_KEY_ID=/ab2d/dev/core/sensitive/hpms_auth_key_id
             HPMS_AUTH_KEY_SECRET=/ab2d/dev/core/sensitive/hpms_auth_key_secret
-
-      - name: Assume role in target account
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-region: ${{ vars.AWS_REGION }}
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/delegatedadmin/developer/ab2d-dev-github-actions
 
       - name: Build libraries
         run: gradle -b build.gradle bootJar -Dset.root.project.build.filename=true
