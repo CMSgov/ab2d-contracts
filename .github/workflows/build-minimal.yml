@@ -1,0 +1,26 @@
+name: Build contracts
+run-name: build
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+
+  build:
+    outputs:
+      image_tag: ${{ steps.build_image.outputs.image_tag }}
+    runs-on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
+    env:
+      ECR_REPO: ab2d-contracts
+      TAG_PREFIX: contracts-service
+      AWS_ACCOUNT: ${{ secrets.GF_NON_PROD_ACCOUNT }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Build and push docker image
+        id: build_image
+        run: |
+          TAG_SHORT="test-image-does-not-exist"    
+          echo "image_tag=$TAG_SHORT" >> $GITHUB_OUTPUT
