@@ -1,4 +1,5 @@
 name: Build & deploy contracts
+run-name: Build & deploy
 
 permissions:
   contents: read
@@ -13,9 +14,6 @@ on:
       environment:
         required: true
         type: string
-      image_tag:
-        required: true
-        type: string
   workflow_dispatch:
     inputs:
       environment:
@@ -25,17 +23,13 @@ on:
         options:
           - dev
           - test
-      image_tag:
-        description: ECR image tag for selected module (contracts-service-<branch>-<SHA>)
-        required: true
-        type: string
 
 jobs:
   build:
     uses: ./.github/workflows/build.yml
     secrets: inherit
   deploy:
-    needs: [test]
+    needs: [build]
     uses: ./.github/workflows/deploy.yml
     with:
       IMAGE_TAG: ${{ needs.build.outputs.image_tag }}
