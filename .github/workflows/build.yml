@@ -90,6 +90,7 @@ jobs:
           echo "image_tag=$TAG_SHORT" >> $GITHUB_OUTPUT
 
   sonarqube:
+    needs: [build]
     if: ${{ inputs.run_sonar == true }}
     uses: ./.github/workflows/sonarqube.yml
     secrets: inherit
