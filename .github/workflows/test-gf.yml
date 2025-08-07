@@ -4,11 +4,12 @@ on:
   workflow_call:
   workflow_dispatch: # Allow manual trigger
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   test:
-    permissions:
-      contents: read
-      id-token: write
     runs-on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
     env:
       ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
