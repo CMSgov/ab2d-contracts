@@ -27,7 +27,7 @@ jobs:
     secrets: inherit
   deploy:
     needs: [build]
-    uses: ./.github/workflows/deploy.yml
+    uses: ./.github/workflows/deploy-minimal.yml
     with:
       environment: ${{ inputs.environment }}
       image_tag: ${{ needs.build.outputs.image_tag }}
