@@ -3,9 +3,18 @@ run-name: build
 
 on:
   workflow_call:
+    inputs:
+      run_tests:
+        description: Run tests
+        type: boolean
+        default: true
+      run_sonar:
+        description: Run SonarQube
+        type: boolean
+        default: false
     outputs:
       image_tag:
-        description: "Image tag pushed to non-prod ECR"
+        description: Image tag pushed to non-prod ECR
         value: ${{ jobs.build.outputs.image_tag }}
   workflow_dispatch:
 
@@ -13,10 +22,7 @@ permissions:
   contents: read
   id-token: write
 
-
-
 jobs:
-
   build:
     runs-on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
     env:
@@ -52,8 +58,11 @@ jobs:
           role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/delegatedadmin/developer/ab2d-dev-github-actions
 
       - name: Build libraries
-        run: |
-          gradle -b build.gradle bootJar -Dset.root.project.build.filename=true
+        run: gradle -b build.gradle bootJar -Dset.root.project.build.filename=true
+
+      - name: Run tests
+        if: ${{ inputs.run_tests == 'true' }}
+        run: gradle clean test --info build
 
       - name: Build and push docker image
         id: build_image
@@ -68,3 +77,19 @@ jobs:
           docker push "$ECR_URI" --all-tags
           echo "Published **$ECR_URI:$TAG_SHORT**" >> $GITHUB_STEP_SUMMARY
           echo "image_tag=$TAG_SHORT" >> $GITHUB_OUTPUT
+
+      - name: SonarQube Analysis
+        if: ${{ inputs.run_sonar == 'true' }}
+        run: |
+          gradle sonar \
+            -Dsonar.ci.autoconfig.disabled=true \
+            -Dsonar.projectKey=ab2d-contracts \
+            -Dsonar.host.url=https://sonarqube.cloud.cms.gov \
+            -Dsonar.login=$SONAR_TOKEN
+
+      - name: SonarQube Quality Gate
+        if: ${{ inputs.run_sonar == 'true' }}
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        with:
+          scanMetadataReportFile: build/sonar/report-task.txt
+        timeout-minutes: 10
