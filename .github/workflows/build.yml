@@ -58,8 +58,6 @@ jobs:
             ARTIFACTORY_URL=/artifactory/url
             ARTIFACTORY_USER=/artifactory/user
             ARTIFACTORY_PASSWORD=/artifactory/password
-            SONAR_HOST_URL=/sonarqube/url
-            SONAR_TOKEN=/sonarqube/token
             HPMS_AUTH_KEY_ID=/ab2d/dev/core/sensitive/hpms_auth_key_id
             HPMS_AUTH_KEY_SECRET=/ab2d/dev/core/sensitive/hpms_auth_key_secret
 
@@ -83,6 +81,7 @@ jobs:
           docker push "$ECR_URI" --all-tags
           echo "Published **$ECR_URI:$TAG_SHORT**" >> $GITHUB_STEP_SUMMARY
           echo "image_tag=$TAG_SHORT" >> $GITHUB_OUTPUT
+
   sonarqube:
     if: ${{ inputs.run_sonar == true }}
     uses: ./.github/workflows/sonarqube.yml
