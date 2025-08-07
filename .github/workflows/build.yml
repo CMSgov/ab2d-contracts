@@ -13,15 +13,16 @@ permissions:
   contents: read
   id-token: write
 
-env:
-  ECR_REPO: ab2d-contracts
-  TAG_PREFIX: contracts-service
-  AWS_ACCOUNT: ${{ secrets.GF_NON_PROD_ACCOUNT }}
-  RUNNER: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
+
 
 jobs:
+
   build:
-    runs-on: ${{ env.RUNNER }}
+    runs-on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
+    env:
+      ECR_REPO: ab2d-contracts
+      TAG_PREFIX: contracts-service
+      AWS_ACCOUNT: ${{ secrets.GF_NON_PROD_ACCOUNT }}
     outputs:
       image_tag: ${{ steps.build_image.outputs.image_tag }}
 
