@@ -11,7 +11,7 @@ on:
       run_sonar:
         description: Run SonarQube
         type: boolean
-        default: false
+        default: true
     outputs:
       image_tag:
         description: Image tag pushed to non-prod ECR
