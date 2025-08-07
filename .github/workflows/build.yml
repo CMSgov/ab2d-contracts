@@ -85,7 +85,7 @@ jobs:
           echo "image_tag=$TAG_SHORT" >> $GITHUB_OUTPUT
 
       - name: SonarQube Analysis
-        if: ${{ inputs.run_sonar == 'true' }}
+        if: ${{ inputs.run_sonar }}
         run: |
           gradle sonar \
             -Dsonar.ci.autoconfig.disabled=true \
@@ -94,7 +94,7 @@ jobs:
             -Dsonar.login=$SONAR_TOKEN
 
       - name: SonarQube Quality Gate
-        if: ${{ inputs.run_sonar == 'true' }}
+        if: ${{ inputs.run_sonar }}
         uses: sonarsource/sonarqube-quality-gate-action@master
         with:
           scanMetadataReportFile: build/sonar/report-task.txt
