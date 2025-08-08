@@ -3,8 +3,7 @@ name: Push to main
 on:
   push:
     branches:
-#      - main
-      - AB2D-6840/fix_ci
+      - main
 
 permissions:
   contents: read
