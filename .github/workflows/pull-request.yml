@@ -14,11 +14,13 @@ permissions:
 
 jobs:
   build:
+    secrets: inherit
     uses: ./.github/workflows/build.yml
     with:
       run_tests: true
       push_image: false
-    secrets: inherit
+
   sonarqube:
     uses: ./.github/workflows/sonarqube.yml
+    secrets: inherit
 
