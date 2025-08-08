@@ -28,6 +28,8 @@ permissions:
   contents: read
   id-token: write
 
+concurrency:
+  group: build-deploy-${{ inputs.environment }}
 
 jobs:
   build:
