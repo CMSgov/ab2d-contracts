@@ -17,11 +17,11 @@ on:
   workflow_dispatch:
     inputs:
       run_tests:
-        description: Run tests before building
+        description: Run tests - defaults to true
         type: boolean
         default: true
       run_sonar:
-        description: Run SonarQube
+        description: Run SonarQube - defaults to true
         type: boolean
         default: true
 
