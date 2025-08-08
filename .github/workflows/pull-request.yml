@@ -1,9 +1,9 @@
 name: Pull request
 
 on:
-  push:
-    branches:
-      - AB2D-6840/fix_ci
+#  push:
+#    branches:
+#      - AB2D-6840/fix_ci
   pull_request:
     branches:
       - main
@@ -19,13 +19,6 @@ jobs:
     with:
       run_tests: true
       push_image: false
-
-  build-summary:
-    needs: [build]
-    runs-on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
-    steps:
-      - name: Build summary
-        run: echo "Published **${{ needs.build.outputs.image_tag }}**" >> $GITHUB_STEP_SUMMARY
 
   sonarqube:
     uses: ./.github/workflows/sonarqube.yml
