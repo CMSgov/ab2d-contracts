@@ -1,9 +1,6 @@
 name: Pull request
 
 on:
-  push:
-    branches:
-      - AB2D-6840/fix_ci
   pull_request:
     branches:
       - main
