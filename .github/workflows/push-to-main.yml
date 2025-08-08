@@ -35,6 +35,7 @@ jobs:
       image_tag: ${{ needs.build.outputs.image_tag }}
 
   sonarqube:
+    secrets: inherit
     uses: ./.github/workflows/sonarqube.yml
 
 
