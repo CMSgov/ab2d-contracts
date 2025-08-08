@@ -45,8 +45,7 @@ jobs:
             -Dsonar.ci.autoconfig.disabled=true \
             -Dsonar.projectKey=ab2d-contracts \
             -Dsonar.host.url=$SONAR_HOST_URL \
-            -Dsonar.token=$SONAR_TOKEN \
-            -Dsonar.branch.name=$GITHUB_REF_NAME
+            -Dsonar.token=$SONAR_TOKEN 
 
       - name: Quality Gate
         id: sonarqube-quality-gate-check
