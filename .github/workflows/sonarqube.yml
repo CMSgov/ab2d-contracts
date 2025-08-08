@@ -9,7 +9,6 @@ permissions:
   id-token: write
 
 env:
-  CODEBUILD_PREFIX: codebuild-ab2d-contracts
   SONAR_PROJECT_KEY: ab2d-contracts
 
 jobs:

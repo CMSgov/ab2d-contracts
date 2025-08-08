@@ -30,9 +30,6 @@ permissions:
   contents: read
   id-token: write
 
-env:
-  CODEBUILD_PREFIX: codebuild-ab2d-contracts
-
 jobs:
   apply_tofu:
     uses: cmsgov/ab2d/.github/workflows/terraform-microservices-gf.yml@main
@@ -41,6 +38,6 @@ jobs:
       contracts_service_image: ${{ inputs.image_tag }}
       apply: true
       ref: main
-      runner: ${{ env.CODEBUILD_PREFIX }}-${{github.run_id}}-${{github.run_attempt}}
+      runner: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
     secrets:
       aws_account: ${{contains(fromJSON('["dev", "test"]'), inputs.environment) && secrets.GF_NON_PROD_ACCOUNT || secrets.GF_PROD_ACCOUNT}}

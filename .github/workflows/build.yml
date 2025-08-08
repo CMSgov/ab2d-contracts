@@ -30,13 +30,12 @@ permissions:
   id-token: write
 
 env:
-  CODEBUILD_PREFIX: codebuild-ab2d-contracts
   ECR_REPO: ab2d-contracts
   TAG_PREFIX: contracts-service
 
 jobs:
   build:
-    runs-on: ${{ env.CODEBUILD_PREFIX }}-${{github.run_id}}-${{github.run_attempt}}
+    runs-on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
     env:
       AWS_ACCOUNT: ${{ secrets.GF_NON_PROD_ACCOUNT }}
     outputs:
