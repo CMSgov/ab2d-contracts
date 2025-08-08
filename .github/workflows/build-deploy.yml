@@ -12,11 +12,11 @@ on:
         required: true
         type: string
       run_tests:
-        description: Run tests
+        description: Run tests - defaults to true
         type: boolean
         default: true
       run_sonar:
-        description: Run SonarQube
+        description: Run SonarQube - defaults to true
         type: boolean
         default: true
   workflow_dispatch:
