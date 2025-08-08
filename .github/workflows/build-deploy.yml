@@ -10,6 +10,9 @@ on:
       run_tests:
         type: boolean
         default: true
+      run_sonar:
+        type: boolean
+        default: true
   workflow_dispatch:
     inputs:
       environment:
@@ -23,6 +26,10 @@ on:
         description: Run tests
         type: boolean
         default: true
+      run_sonar:
+        description: Run SonarQube
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -33,21 +40,21 @@ concurrency:
 
 jobs:
   build:
-    uses: ./.github/workflows/build.yml
     secrets: inherit
+    uses: ./.github/workflows/build.yml
     with:
       run_tests: ${{ inputs.run_tests }}
       push_image: true
 
   deploy:
+    secrets: inherit
     needs: [build]
     uses: ./.github/workflows/deploy.yml
     with:
       environment: ${{ inputs.environment }}
       image_tag: ${{ needs.build.outputs.image_tag }}
-    secrets: inherit
 
   sonarqube:
+    secrets: inherit
     if: ${{ inputs.run_sonar == true }}
     uses: ./.github/workflows/sonarqube.yml
-    secrets: inherit
