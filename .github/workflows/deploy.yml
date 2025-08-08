@@ -26,6 +26,9 @@ on:
         required: true
         type: string
 
+env:
+  CODEBUILD_PREFIX: codebuild-ab2d-contracts
+
 permissions:
   contents: read
   id-token: write
@@ -38,6 +41,6 @@ jobs:
       contracts_service_image: ${{ inputs.image_tag }}
       apply: true
       ref: main
-      runner: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
+      runner: ${{ env.CODEBUILD_PREFIX }}-${{github.run_id}}-${{github.run_attempt}}
     secrets:
       aws_account: ${{contains(fromJSON('["dev", "test"]'), inputs.environment) && secrets.GF_NON_PROD_ACCOUNT || secrets.GF_PROD_ACCOUNT}}

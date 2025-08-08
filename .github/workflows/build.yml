@@ -1,13 +1,18 @@
 name: Build contracts
 run-name: build
 
+env:
+  CODEBUILD_PREFIX: codebuild-ab2d-contracts
+  ECR_REPO: ab2d-contracts
+  TAG_PREFIX: contracts-service
+
 on:
   workflow_call:
     inputs:
-      run_tests:
+      push_image:
         type: boolean
         default: true
-      run_sonar:
+      run_tests:
         type: boolean
         default: true
     outputs:
@@ -16,12 +21,12 @@ on:
         value: ${{ jobs.build.outputs.image_tag }}
   workflow_dispatch:
     inputs:
-      run_tests:
-        description: Run tests - defaults to true
+      push_image:
+        description: Build and push Docker image to ECR
         type: boolean
         default: true
-      run_sonar:
-        description: Run SonarQube - defaults to true
+      run_tests:
+        description: Run tests
         type: boolean
         default: true
 
@@ -31,10 +36,8 @@ permissions:
 
 jobs:
   build:
-    runs-on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
+    runs-on: ${{ env.CODEBUILD_PREFIX }}-${{github.run_id}}-${{github.run_attempt}}
     env:
-      ECR_REPO: ab2d-contracts
-      TAG_PREFIX: contracts-service
       AWS_ACCOUNT: ${{ secrets.GF_NON_PROD_ACCOUNT }}
     outputs:
       image_tag: ${{ steps.build_image.outputs.image_tag }}
@@ -68,12 +71,11 @@ jobs:
         if: ${{ inputs.run_tests == true }}
         run: ./gradlew clean test --info
 
-      - name: Build project
-        run: ./gradlew -b build.gradle bootJar -Dset.root.project.build.filename=true
-
-      - name: Build and push docker image
+      - name: Build and push Docker image
+        if: ${{ inputs.push_image == true }}
         id: build_image
         run: |
+          ./gradlew -b build.gradle bootJar -Dset.root.project.build.filename=true
           ECR_DOMAIN="$AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com"
           SHA_SHORT=$(git rev-parse --short HEAD)
           ECR_URI="$ECR_DOMAIN/$ECR_REPO"
@@ -85,8 +87,3 @@ jobs:
           echo "Published **$ECR_URI:$TAG_SHORT**" >> $GITHUB_STEP_SUMMARY
           echo "image_tag=$TAG_SHORT" >> $GITHUB_OUTPUT
 
-  sonarqube:
-    needs: [build]
-    if: ${{ inputs.run_sonar == true }}
-    uses: ./.github/workflows/sonarqube.yml
-    secrets: inherit

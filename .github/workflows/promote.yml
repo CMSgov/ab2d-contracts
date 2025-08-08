@@ -1,10 +1,16 @@
 name: Promote contracts
 run-name: promote ${{ inputs.image_tag }}
 
+env:
+  TAG_NAME: ${{ inputs.image_tag }}
+  SOURCE_REPO: ab2d-contracts
+  DEST_REPO: ab2d-contracts
+  CODEBUILD_PREFIX: codebuild-ab2d-contracts
+
 on:
   workflow_call:
     inputs:
-      tag_suffix:
+      image_tag:
         required: true
         type: string
   workflow_dispatch:
@@ -23,11 +29,8 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    runs-on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
-    env:
-      TAG_NAME: ${{ inputs.image_tag }}
-      SOURCE_REPO: ab2d-contracts
-      DEST_REPO: ab2d-contracts
+    runs-on: ${{ env.CODEBUILD_PREFIX }}-${{github.run_id}}-${{github.run_attempt}}
+
     steps:
       - name: Authenticate to non-prod AWS account
         uses: aws-actions/configure-aws-credentials@v4

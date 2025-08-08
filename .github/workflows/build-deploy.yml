@@ -12,11 +12,6 @@ on:
         required: true
         type: string
       run_tests:
-        description: Run tests - defaults to true
-        type: boolean
-        default: true
-      run_sonar:
-        description: Run SonarQube - defaults to true
         type: boolean
         default: true
   workflow_dispatch:
@@ -32,10 +27,6 @@ on:
         description: Run tests
         type: boolean
         default: true
-      run_sonar:
-        description: Run SonarQube
-        type: boolean
-        default: true
 
 jobs:
   build:
@@ -43,7 +34,7 @@ jobs:
     secrets: inherit
     with:
       run_tests: ${{ inputs.run_tests }}
-      run_sonar: false
+      push_image: true
 
   deploy:
     needs: [build]
@@ -54,7 +45,6 @@ jobs:
     secrets: inherit
 
   sonarqube:
-    needs: [build]
     if: ${{ inputs.run_sonar == true }}
     uses: ./.github/workflows/sonarqube.yml
     secrets: inherit

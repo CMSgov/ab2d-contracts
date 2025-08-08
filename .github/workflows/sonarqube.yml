@@ -2,11 +2,15 @@ name: SonarQube
 
 on:
   workflow_call:
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:
 
 permissions:
   contents: read
   id-token: write
+
+env:
+  CODEBUILD_PREFIX: codebuild-ab2d-contracts
+  SONAR_PROJECT_KEY: ab2d-contracts
 
 jobs:
   sonarqube:
@@ -43,13 +47,11 @@ jobs:
         run: |
           ./gradlew sonar \
             -Dsonar.ci.autoconfig.disabled=true \
-            -Dsonar.projectKey=ab2d-contracts \
+            -Dsonar.projectKey=$SONAR_PROJECT_KEY \
             -Dsonar.host.url=$SONAR_HOST_URL \
-            -Dsonar.token=$SONAR_TOKEN \
-            -Dsonar.branch.name=$GITHUB_REF_NAME
+            -Dsonar.token=$SONAR_TOKEN
 
       - name: Quality Gate
-        id: sonarqube-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@master
         with:
           scanMetadataReportFile: build/sonar/report-task.txt
