@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
     inputs:
       run_tests:
-        description: Run tests
+        description: Run tests before building
         type: boolean
         default: true
       run_sonar:
@@ -47,10 +47,6 @@ jobs:
           distribution: 'adopt'
           java-version: '17'
 
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: 8.4
-
       - name: Assume role in target account
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -68,12 +64,13 @@ jobs:
             HPMS_AUTH_KEY_ID=/ab2d/dev/core/sensitive/hpms_auth_key_id
             HPMS_AUTH_KEY_SECRET=/ab2d/dev/core/sensitive/hpms_auth_key_secret
 
-      - name: Build project
-        run: gradle -b build.gradle bootJar -Dset.root.project.build.filename=true
-
       - name: Run tests
         if: ${{ inputs.run_tests == true }}
-        run: gradle clean test --info build
+        run: ./gradlew clean test --info
+
+      - name: Build project
+        if: ${{ inputs.run_tests == false }}
+        run: ./gradlew -b build.gradle bootJar -Dset.root.project.build.filename=true
 
       - name: Build and push docker image
         id: build_image

@@ -21,10 +21,6 @@ jobs:
           distribution: 'adopt'
           java-version: '17'
 
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: 8.4
-
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ vars.AWS_REGION }}
@@ -45,7 +41,7 @@ jobs:
 
       - name: SonarQube Analysis
         run: |
-          gradle sonar \
+          ./gradlew sonar \
             -Dsonar.ci.autoconfig.disabled=true \
             -Dsonar.projectKey=ab2d-contracts \
             -Dsonar.host.url=$SONAR_HOST_URL \
