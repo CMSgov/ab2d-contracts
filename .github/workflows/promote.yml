@@ -1,12 +1,6 @@
 name: Promote contracts
 run-name: promote ${{ inputs.image_tag }}
 
-env:
-  TAG_NAME: ${{ inputs.image_tag }}
-  SOURCE_REPO: ab2d-contracts
-  DEST_REPO: ab2d-contracts
-  CODEBUILD_PREFIX: codebuild-ab2d-contracts
-
 on:
   workflow_call:
     inputs:
@@ -23,6 +17,12 @@ on:
 permissions:
   contents: read
   id-token: write
+
+env:
+  TAG_NAME: ${{ inputs.image_tag }}
+  SOURCE_REPO: ab2d-contracts
+  DEST_REPO: ab2d-contracts
+  CODEBUILD_PREFIX: codebuild-ab2d-contracts
 
 jobs:
   promote:

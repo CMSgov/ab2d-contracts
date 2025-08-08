@@ -1,10 +1,6 @@
 name: Build & deploy contracts
 run-name: build-deploy ${{ inputs.environment }}
 
-permissions:
-  contents: read
-  id-token: write
-
 on:
   workflow_call:
     inputs:
@@ -27,6 +23,11 @@ on:
         description: Run tests
         type: boolean
         default: true
+
+permissions:
+  contents: read
+  id-token: write
+
 
 jobs:
   build:

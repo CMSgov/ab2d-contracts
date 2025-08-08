@@ -1,11 +1,6 @@
 name: Build contracts
 run-name: build
 
-env:
-  CODEBUILD_PREFIX: codebuild-ab2d-contracts
-  ECR_REPO: ab2d-contracts
-  TAG_PREFIX: contracts-service
-
 on:
   workflow_call:
     inputs:
@@ -33,6 +28,11 @@ on:
 permissions:
   contents: read
   id-token: write
+
+env:
+  CODEBUILD_PREFIX: codebuild-ab2d-contracts
+  ECR_REPO: ab2d-contracts
+  TAG_PREFIX: contracts-service
 
 jobs:
   build:
