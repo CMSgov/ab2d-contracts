@@ -42,7 +42,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
-      run_tests: ${{ inputs.run_tests}
+      run_tests: ${{ inputs.run_tests }}
       run_sonar: false
 
   deploy:
