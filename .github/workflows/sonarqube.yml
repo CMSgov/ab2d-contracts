@@ -1,6 +1,9 @@
 name: SonarQube
 
 on:
+  push:
+    branches:
+      - sq-test-123
   workflow_call:
   workflow_dispatch: # Allow manual trigger
 
