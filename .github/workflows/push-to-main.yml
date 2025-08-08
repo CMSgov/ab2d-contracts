@@ -18,13 +18,6 @@ jobs:
       run_tests: true
       push_image: true
 
-  build-summary:
-    needs: [build]
-    runs-on: codebuild-ab2d-contracts-${{github.run_id}}-${{github.run_attempt}}
-    steps:
-      - name: Build summary
-        run: echo "Published **${{ needs.build.outputs.image_tag }}**" >> $GITHUB_STEP_SUMMARY
-
   deploy-dev:
     secrets: inherit
     needs: [build]
