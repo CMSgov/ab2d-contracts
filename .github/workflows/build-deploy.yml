@@ -42,8 +42,8 @@ jobs:
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
-      run_sonar: false
       run_tests: ${{ inputs.run_tests}
+      run_sonar: false
 
   deploy:
     needs: [build]
@@ -54,7 +54,7 @@ jobs:
     secrets: inherit
 
   sonarqube:
-    needs: [deploy]
+    needs: [build]
     if: ${{ inputs.run_sonar == true }}
     uses: ./.github/workflows/sonarqube.yml
     secrets: inherit
