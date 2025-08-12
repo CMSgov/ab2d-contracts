@@ -1,15 +1,23 @@
-name: pull request jobs
+name: Pull request
 
 on:
   pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
-  test:
-    uses: ./.github/workflows/test.yml
-    secrets: inherit
   build:
-    needs: test
+    secrets: inherit
     uses: ./.github/workflows/build.yml
     with:
-      environment: test
+      run_tests: true
+      push_image: false
+
+  sonarqube:
+    uses: ./.github/workflows/sonarqube.yml
     secrets: inherit
+

@@ -32,9 +32,6 @@ secrets.yml
 .gradle
 .build
 build
-gradlew
-gradlew.bat
-gradle
 
 HELP.md
 target/
