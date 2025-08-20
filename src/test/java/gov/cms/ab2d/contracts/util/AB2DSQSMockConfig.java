@@ -3,8 +3,8 @@ package gov.cms.ab2d.contracts.util;
 import gov.cms.ab2d.eventclient.clients.SQSEventClient;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
 
@@ -18,13 +18,11 @@ public class AB2DSQSMockConfig {
     System.setProperty("feature.sqs.enabled", "false");
   }
 
-//  @Bean
-//  public SqsAsyncClient amazonSQSAsync() {
-//    return mock(SqsAsyncClient.class);
-//  }
-//
-//  @MockBean
-//  SQSEventClient sQSEventClient;
+  @MockitoBean
+  SqsAsyncClient amazonSQSAsync;
+
+  @MockitoBean
+  SQSEventClient sQSEventClient;
 
   @Bean("mockAmazonSQS")
   public SqsAsyncClient amazonSQSAsync() {
