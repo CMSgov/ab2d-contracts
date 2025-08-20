@@ -89,6 +89,12 @@ jacoco {
     reportsDirectory = layout.buildDirectory.dir("$buildDir/reports/jacoco")
 }
 
+sonarqube {
+    properties {
+        property "sonar.java.binaries", "$buildDir/classes"
+    }
+}
+
 repositories {
     mavenCentral()
     mavenLocal()
