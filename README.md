@@ -1,3 +1,7 @@
+# THIS PROJECT HAS BEEN ARCHIVED
+As part of AB2D's _2025 Greenfield Migration_, this repository was targeted for migration/consolidation into the primary AB2D repository.
+Please find the source code that supports AB2D's contracts microservice in their new home under https://github.com/CMSgov/ab2d/tree/main/contracts.
+
 # Ab2d-Contracts
 
 This service gets data from hpms and shares contract information with other services.
